@@ -1,6 +1,16 @@
 #ifndef TREE_H
 #define TREE_H
 
+#include <stdarg.h>
+
+//#define DEBUG
+
+#ifdef DEBUG
+#define ON_DEBUG(...) __VA_ARGS__
+#else
+#define ON_DEBUG(...)
+#endif
+
 enum Errors_of_tree
 {
     NO_ERRORS                  = 0,
@@ -17,9 +27,10 @@ enum Errors_of_tree
 
 enum Value_type
 {
-    VARIABLE  = 0,
-    NUMBER    = 1,
-    OPERATION = 2
+    UNKNOWN_TYPE = 0,
+    VARIABLE     = 1,
+    NUMBER       = 2,
+    OPERATION    = 3
 };
 
 enum Variables
@@ -40,7 +51,8 @@ enum Operations
 struct Value
 {
     Value_type type;
-    union {
+    union
+    {
         int number;
         Operations operation;
         Variables variable;
