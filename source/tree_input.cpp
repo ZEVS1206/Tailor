@@ -20,7 +20,7 @@ static char * skip_spaces(char *buffer, char *end_pointer)
     {
         return buffer;
     }
-    while (isspace(*buffer))
+    while (buffer < end_pointer && isspace(*buffer))
     {
         buffer++;
     }
@@ -119,7 +119,7 @@ Errors_of_tree get_tree_from_file(struct Tree *tree, const char *file_source_nam
 static char * get_value_from_file(char *str, size_t size_of_str, char *buffer, char *end_pointer)
 {
     size_t index = 0;
-    while (buffer != end_pointer && isdigit(*buffer) && index < size_of_str)
+    while (buffer < end_pointer && isalnum(*buffer) && index < size_of_str)
     {
         str[index] = *buffer;
         index++;
@@ -127,7 +127,6 @@ static char * get_value_from_file(char *str, size_t size_of_str, char *buffer, c
     }
     if (index < size_of_str - 1)
     {
-        index++;
         str[index] = '\0';
     }
     return buffer;
@@ -136,6 +135,10 @@ static char * get_value_from_file(char *str, size_t size_of_str, char *buffer, c
 static void parse_information_from_file(struct Node *root, char **buffer, char *end_pointer)
 {
     *buffer = skip_spaces(*buffer, end_pointer);
+    if (*buffer >= end_pointer)
+    {
+        return;
+    }
 
     if (*buffer[0] == '(')
     {
@@ -146,10 +149,15 @@ static void parse_information_from_file(struct Node *root, char **buffer, char *
             printf("Error of creating node!\n");
             return;
         }
+        (root->left)->parent_node = root;
         ON_DEBUG(printf("go to left\n");)
         ON_DEBUG(getchar();)
         parse_information_from_file(root->left, buffer, end_pointer);
         ON_DEBUG(printf("leave left\n");)
+        if (*buffer >= end_pointer)
+        {
+            return;
+        }
         if (*buffer[0] == '\n')
         {
             return;
@@ -162,19 +170,26 @@ static void parse_information_from_file(struct Node *root, char **buffer, char *
             transform_to_operation(*buffer[0], &(root->value));
             ON_DEBUG(printf("operation = %c\n", *buffer[0]);)
             (root->value).type = OPERATION;
+            (*buffer)++;
         }
-        (*buffer) += 2;
+        *buffer = skip_spaces(*buffer, end_pointer);
+        (*buffer)++;
         root->right = (Node *) calloc(1, sizeof(Node));
         if (root->right == NULL)
         {
             printf("Error of creating node!\n");
             return;
         }
+        (root->right)->parent_node = root;
         ON_DEBUG(printf("go to right\n");)
         ON_DEBUG(getchar();)
         parse_information_from_file(root->right, buffer, end_pointer);
         ON_DEBUG(printf("leave right\n");)
         ON_DEBUG(getchar();)
+        if (*buffer >= end_pointer)
+        {
+            return;
+        }
         if (*buffer[0] == '\n')
         {
             return;

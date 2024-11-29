@@ -76,7 +76,8 @@ struct Tree
 
 Errors_of_tree tree_constructor(struct Tree *tree);
 Errors_of_tree tree_destructor(struct Tree *tree);
-
+void differentiation(struct Node *root);
+void calculation_of_tree(struct Node *root);
 Errors_of_tree create_new_node(struct Node **root, struct Value *value, struct Node *left, struct Node *right);
 
 #endif
