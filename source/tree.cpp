@@ -117,7 +117,7 @@ int main()
     if (error != NO_ERRORS)
     {
         fprintf(stderr, "error = %d\n", error);
-        return 1;
+        return error;
     }
     error = get_tree_from_file(&tree, "source/input.txt");
     if (error != NO_ERRORS)
@@ -125,23 +125,31 @@ int main()
         fprintf(stderr, "error = %d\n", error);
         return 1;
     }
-    tree.error = NO_ERRORS;
     tree.tmp_root = tree.root;
+    // struct Value new_value = {.type = OPERATION, .operation = OP_ADD};
+    // struct Node *new_left_node = (Node *) calloc(1, sizeof(Node));
+    // struct Node *new_right_node = (Node *) calloc(1, sizeof(Node));
+    // new_left_node->parent_node = (tree.tmp_root)->left;
+    // new_right_node->parent_node = (tree.tmp_root)->left;
+    // (new_left_node->value).type = NUMBER;
+    // (new_right_node->value).type = VARIABLE;
+    // (new_left_node->value).number = 2;
+    // (new_right_node->value).number = VAR_X;
+    // error = create_new_node(&(tree.tmp_root)->left, &new_value, new_left_node, new_right_node);
+    tree.error = NO_ERRORS;
     graphic_dump(&tree, "example");
     if (tree.error != NO_ERRORS)
     {
         fprintf(stderr, "error = %d\n", tree.error);
         return 1;
     }
-    tree.tmp_root = tree.root;
-    differentiation(tree.tmp_root);
+    differentiation(tree.root);
     //calculation_of_tree(tree.tmp_root);
     if (tree.error != NO_ERRORS)
     {
         fprintf(stderr, "error = %d\n", tree.error);
         return 1;
     }
-    tree.tmp_root = tree.root;
     //graphic_dump(&tree, "after_calculation");
     graphic_dump(&tree, "after_differentiation");
     error = tree_destructor(&tree);

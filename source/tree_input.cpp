@@ -9,7 +9,6 @@
 static void parse_information_from_file(struct Node *root, char **buffer, char *end_pointer);
 static size_t get_size_of_file(FILE *file_pointer);
 static char * get_value_from_file(char *str, size_t size_of_str, char *buffer, char *end_pointer);
-static char * save_root_data(struct Node *root, char *buffer);
 static char * skip_spaces(char *buffer, char *end_pointer);
 static void transform_to_variable(const char *str, struct Value *value);
 static void transform_to_operation(const char symbol, struct Value *value);

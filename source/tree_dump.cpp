@@ -197,7 +197,7 @@ void graphic_dump(struct Tree *tree, char *operation)
         tree->error = ERROR_OF_DUMP;
         return;
     }
-
+    tree->tmp_root = tree->root;
     const char file_name[] = "dump/dump.txt";
     FILE *file_pointer = fopen(file_name, "w");
     fprintf(file_pointer, "digraph Tree {\n");
