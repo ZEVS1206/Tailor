@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <math.h>
 
 #include "tree.h"
 
@@ -14,6 +15,8 @@ static void differentiation_of_operation(struct Node **root);
 static void differentiation_sum_sub(struct Node **root);
 static void differentiation_mul(struct Node **root);
 static void differentiation_mul_expressions(struct Node **root);
+static void differentiation_pow_expression(struct Node **root);
+static void differentiation_pow(struct Node **root);
 //static void differentiation_mul_expression_and_constant(struct Node **root);
 static void differentiation_div(struct Node **root);
 static void replace_node_with_number(struct Node **root, int number);
@@ -209,6 +212,65 @@ static void differentiation_mul_expressions(struct Node **root)
     return;
 }
 
+static void differentiation_pow(struct Node **root)
+{
+    if ((*root) == NULL)
+    {
+        return;
+    }
+
+    if ((((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == NUMBER)
+    {
+        calculation_of_subtree(root);
+        bool attempt = try_differentiation_constant(root);
+        return;
+    }
+
+    differentiation_pow_expression(root);
+    return;
+}
+
+
+static void differentiation_pow_expression(struct Node **root)
+{
+    if ((*root) == NULL)
+    {
+        return;
+    }
+    Errors_of_tree error = NO_ERRORS;
+    struct Value new_root_value = {.type = OPERATION, .operation = OP_MUL};
+    struct Value new_left_node_value = {.type = NUMBER, .number = (((*root)->right)->value).number};
+    struct Value new_right_node_value = {.type = OPERATION, .operation = OP_DEG};
+    struct Value new_right_right_node_value = {.type = NUMBER, .number = (((*root)->right)->value).number - 1};
+    struct Value new_right_left_node_value = {.type = VARIABLE, .variable = (((*root)->left)->value).variable};
+    struct Node *new_left_node = NULL;
+    struct Node *new_right_node = NULL;
+    struct Node *new_right_left_node = NULL;
+    struct Node *new_right_right_node = NULL;
+    error = create_new_node(&new_left_node, &new_left_node_value, NULL, NULL);
+    if (error != NO_ERRORS)
+    {
+        return;
+    }
+    error = create_new_node(&new_right_left_node, &new_right_left_node_value, NULL, NULL);
+    if (error != NO_ERRORS)
+    {
+        return;
+    }
+    error = create_new_node(&new_right_right_node, &new_right_right_node_value, NULL, NULL);
+    if (error != NO_ERRORS)
+    {
+        return;
+    }
+    error = create_new_node(&new_right_node, &new_right_node_value, new_right_left_node, new_right_right_node);
+    if (error != NO_ERRORS)
+    {
+        return;
+    }
+    error = create_new_node(root, &new_root_value, new_left_node, new_right_node);
+    return;
+}
+
 
 
 
@@ -249,10 +311,11 @@ static void differentiation_of_operation(struct Node **root)
     }
     switch (((*root)->value).operation)
     {
-        case OP_ADD: differentiation_sum_sub    (root); break;
-        case OP_SUB: differentiation_sum_sub    (root); break;
-        case OP_MUL: differentiation_mul        (root); break;
-        case OP_DIV: differentiation_div        (root); break;
+        case OP_ADD: differentiation_sum_sub  (root); break;
+        case OP_SUB: differentiation_sum_sub  (root); break;
+        case OP_MUL: differentiation_mul      (root); break;
+        case OP_DIV: differentiation_div      (root); break;
+        case OP_DEG: differentiation_pow      (root); break;
         default: break;
     }
     return;
@@ -358,6 +421,7 @@ static void calculation_of_nodes(struct Value *left_value, struct Value *right_v
         case OP_SUB: *result = left_value->number - right_value->number; break;
         case OP_MUL: *result = left_value->number * right_value->number; break;
         case OP_DIV: *result = left_value->number / right_value->number; break;
+        case OP_DEG: *result = (int)pow(left_value->number, right_value->number);
         default: break;
     }
     return;
@@ -490,9 +554,6 @@ static void destructor_recursive(struct Node *root)
     destructor_recursive(root->left);
     destructor_recursive(root->right);
     //printf("Here\n");
-    if (root != NULL)
-    {
-        free(root);
-    }
+    free(root);
     root = NULL;
 }

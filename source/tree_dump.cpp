@@ -91,6 +91,7 @@ static char * get_operation(Operations operation)
         case OP_MUL:    return "*";
         case OP_SUB:    return "-";
         case OP_DIV:    return "/";
+        case OP_DEG:    return "^";
         case NOT_AN_OP: return "NOT AN OPERATION!";
         default:        return "UNKNOWN OPERATION";
     }
