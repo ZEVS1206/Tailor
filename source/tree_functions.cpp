@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
 
 #include "tree.h"
 
@@ -11,14 +13,30 @@ static void differentiation_of_variable(struct Node **root);
 static void differentiation_of_operation(struct Node **root);
 static void differentiation_sum_sub(struct Node **root);
 static void differentiation_mul(struct Node **root);
-static void differentiation_mul_variables(struct Node **root);
-static void differentiation_mul_variable_and_constant(struct Node **root);
+static void differentiation_mul_expressions(struct Node **root);
+//static void differentiation_mul_expression_and_constant(struct Node **root);
 static void differentiation_div(struct Node **root);
 static void replace_node_with_number(struct Node **root, int number);
 static bool try_differentiation_constant(struct Node **root);
 static bool try_differentiation_variable(struct Node **root);
 static bool try_differentiation_operation(struct Node **root);
 static void try_differentiation_of_constant_and_variable(struct Node **root);
+static struct Node* copy_node(struct Node *root, struct Node *parent);
+
+static struct Node* copy_node(struct Node *root, struct Node *parent)
+{
+    if (root == NULL)
+    {
+        return NULL;
+    }
+    struct Node* new_node = (Node *) calloc(1, sizeof(Node));
+    new_node->left = copy_node(root->left, root);
+    new_node->right = copy_node(root->right, root);
+    new_node->value = root->value;
+    new_node->parent_node = parent;
+    return new_node;
+}
+
 
 
 static void replace_node_with_number(struct Node **root, int number)
@@ -52,15 +70,45 @@ static void differentiation_div(struct Node **root)
     {
         return;
     }
-    struct Node *old_left = (*root)->left;
-    struct Node *old_right = (*root)->right;
-    try_differentiation_of_constant_and_variable(&((*root)->left));
-    try_differentiation_of_constant_and_variable(&((*root)->right));
-    int result = ((((*root)->left)->value).number * (old_right->value).number -
-                  (old_left->value).number * (((*root)->right)->value).number) / ((old_right->value).number *
-                                                                                  (old_right->value).number);
-    struct Value new_value = {.type = NUMBER, .number = result};
-    Errors_of_tree error = create_new_node(root, &new_value, NULL, NULL);
+
+    struct Node *old_left = copy_node((*root)->left, *root);
+    struct Node *old_right = copy_node((*root)->right, *root);
+    struct Node *denominator_node_left = copy_node((*root)->right, *root);
+    struct Node *denominator_node_right = copy_node((*root)->right, *root);
+    differentiation((*root)->left);
+    differentiation((*root)->right);
+    struct Node *diffirentiation_left = copy_node((*root)->left, *root);
+    struct Node *diffirentiation_right = copy_node((*root)->right, *root);
+    struct Value new_root_value = {.type = OPERATION, .operation = OP_DIV};
+    struct Value new_numerator_value = {.type = OPERATION, .operation = OP_SUB};
+    struct Value new_denominator_value = {.type = OPERATION, .operation = OP_MUL};
+    struct Value new_numerator_left_and_right_value = {.type = OPERATION, .operation = OP_MUL};
+    struct Node *new_numerator_left_node = NULL;
+    struct Node *new_numerator_right_node = NULL;
+    struct Node *new_numerator_node = NULL;
+    struct Node *new_denominator_node = NULL;
+    Errors_of_tree error = NO_ERRORS;
+    error = create_new_node(&new_numerator_left_node, &new_numerator_left_and_right_value, diffirentiation_left, old_right);
+    if (error != NO_ERRORS)
+    {
+        return;
+    }
+    error = create_new_node(&new_numerator_right_node, &new_numerator_left_and_right_value, old_left, diffirentiation_right);
+    if (error != NO_ERRORS)
+    {
+        return;
+    }
+    error = create_new_node(&new_numerator_node, &new_numerator_value, new_numerator_left_node, new_numerator_right_node);
+    if (error != NO_ERRORS)
+    {
+        return;
+    }
+    error = create_new_node(&new_denominator_node, &new_denominator_value, denominator_node_left, denominator_node_right);
+    if (error != NO_ERRORS)
+    {
+        return;
+    }
+    error = create_new_node(root, &new_root_value, new_numerator_node, new_denominator_node);
     return;
 }
 
@@ -70,76 +118,99 @@ static void differentiation_sum_sub(struct Node **root)
     {
         return;
     }
-    try_differentiation_of_constant_and_variable(&((*root)->left));
-    try_differentiation_of_constant_and_variable(&((*root)->right));
-    calculation_of_subtree(root);
-}
-
-static void differentiation_mul_variable_and_constant(struct Node **root)
-{
-    if ((*root) == NULL)
+    bool attempt = true;
+    if ((((*root)->left)->value).type == OPERATION)
     {
-        return;
-    }
-
-    int result_differentiation = 0;
-    if ((((*root)->left)->value).type == NUMBER)
-    {
-        result_differentiation = (((*root)->left)->value).number;
+        attempt = try_differentiation_operation(&((*root)->left));
     }
     else
     {
-        result_differentiation = (((*root)->right)->value).number;
+        try_differentiation_of_constant_and_variable(&((*root)->left));
     }
-    replace_node_with_number(root, result_differentiation);
-    return;
+
+    if ((((*root)->right)->value).type == OPERATION)
+    {
+        attempt = try_differentiation_operation(&((*root)->right));
+    }
+    else
+    {
+        try_differentiation_of_constant_and_variable(&((*root)->right));
+    }
+    calculation_of_subtree(root);
 }
 
-
-static void differentiation_mul_variables(struct Node **root)
+/*static void differentiation_mul_expression_and_constant(struct Node **root)
 {
     if ((*root) == NULL)
     {
         return;
     }
-    struct Node *old_left = (Node *) calloc(1, sizeof(Node));
-    struct Node *old_right = (Node *) calloc(1, sizeof(Node));
-    old_left->value = (*root)->left->value;
-    old_right->value = (*root)->right->value;
-    old_left->parent_node = (*root)->left->parent_node;
-    old_right->parent_node = (*root)->right->parent_node;
-    bool attempt = try_differentiation_variable(&(old_left));
-    attempt = try_differentiation_variable(&(old_right));
-    struct Node *new_left_node = (Node *) calloc(1, sizeof(Node));
-    struct Node *new_right_node = (Node *) calloc(1, sizeof(Node));
-    if (new_left_node == NULL || new_right_node == NULL)
+    int result_differentiation = 0;
+    bool attempt = true;
+    if ((((*root)->left)->value).type == OPERATION)
+    {
+        attempt = try_differentiation_operation(&((*root)->left));
+        if ((((*root)->right)->value).type == NUMBER)
+        {
+            calculation_of_subtree(root);
+        }
+    }
+    else if ((((*root)->right)->value).type == OPERATION)
+    {
+        attempt = try_differentiation_operation(&((*root)->right));
+        if ((((*root)->left)->value).type == NUMBER)
+        {
+            calculation_of_subtree(root);
+        }
+    }
+    else
+    {
+        if ((((*root)->left)->value).type == NUMBER)
+        {
+            result_differentiation = (((*root)->left)->value).number;
+        }
+        else
+        {
+            result_differentiation = (((*root)->right)->value).number;
+        }
+        replace_node_with_number(root, result_differentiation);
+    }
+    return;
+}*/
+
+static void differentiation_mul_expressions(struct Node **root)
+{
+    if ((*root) == NULL)
     {
         return;
     }
-    new_left_node->parent_node = (*root);
-    new_right_node->parent_node = (*root);
-    new_left_node->left = (Node *) calloc(1, sizeof(Node));
-    new_left_node->right = (Node *) calloc(1, sizeof(Node));
-    new_right_node->left = (Node *) calloc(1, sizeof(Node));
-    new_right_node->right = (Node *) calloc(1, sizeof(Node));
+    Errors_of_tree error = NO_ERRORS;
+    struct Node *old_left = copy_node((*root)->left, *root);
+    struct Node *old_right = copy_node((*root)->right, *root);
+    differentiation(((*root)->left));
+    differentiation(((*root)->right));
+    struct Node *diffirentiation_left = copy_node((*root)->left, *root);
+    struct Node *diffirentiation_right = copy_node((*root)->right, *root);
     struct Value new_root_value = {.type = OPERATION, .operation = OP_ADD};
-    (new_left_node->value).type = OPERATION;
-    (new_left_node->value).operation = OP_MUL;
-    (new_right_node->value).type = OPERATION;
-    (new_right_node->value).operation = OP_MUL;
-    (((new_left_node)->left)->value).type = NUMBER;
-    (((new_left_node)->left)->value).number = ((old_left)->value).number;
-    (((new_left_node)->right)->value).type = VARIABLE;
-    (((new_left_node)->right)->value).variable = (((*root)->right)->value).variable;
-    (((new_right_node)->right)->value).type = NUMBER;
-    (((new_right_node)->right)->value).number = ((old_right)->value).number;
-    (((new_right_node)->left)->value).type = VARIABLE;
-    (((new_right_node)->left)->value).variable = (((*root)->left)->value).variable;
-    Errors_of_tree error = create_new_node(root, &new_root_value, new_left_node, new_right_node);
-    free(old_left);
-    free(old_right);
+    struct Value new_nodes_value = {.type = OPERATION, .operation = OP_MUL};
+    struct Node *new_left_node = NULL;
+    struct Node *new_right_node = NULL;
+    error = create_new_node(&(new_left_node), &new_nodes_value, diffirentiation_left, old_right);
+    if (error != NO_ERRORS)
+    {
+        return;
+    }
+    error = create_new_node(&(new_right_node), &new_nodes_value, old_left, diffirentiation_right);
+    if (error != NO_ERRORS)
+    {
+        return;
+    }
+    error = create_new_node(root, &new_root_value, new_left_node, new_right_node);
     return;
 }
+
+
+
 
 static void differentiation_mul(struct Node **root)
 {
@@ -147,14 +218,25 @@ static void differentiation_mul(struct Node **root)
     {
         return;
     }
-    if ((((*root)->left)->value).type == VARIABLE && (((*root)->right)->value).type == VARIABLE)
+    // if ((((*root)->left)->value).type == NUMBER || (((*root)->right)->value).type == NUMBER)
+    // {
+    //     differentiation_mul_expression_and_constant(root);
+    // }
+    // else if (((((*root)->left)->value).type == VARIABLE && (((*root)->right)->value).type == VARIABLE) ||
+    //          (((*root)->left)->value).type == OPERATION || (((*root)->right)->value).type == OPERATION)
+    // {
+    differentiation_mul_expressions(root);
+    // else if ((((*root)->left)->value).type == VARIABLE && (((*root)->right)->value).type == NUMBER ||
+    //          (((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == VARIABLE)
+    // {
+    //     differentiation_mul_variable_and_constant(root);
+    // }
+    if ((((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == NUMBER)
     {
-        differentiation_mul_variables(root);
+        calculation_of_subtree(root);
+        bool attempt = try_differentiation_constant(root);
     }
-    else
-    {
-        differentiation_mul_variable_and_constant(root);
-    }
+
     return;
 }
 
@@ -327,17 +409,41 @@ Errors_of_tree create_new_node(struct Node **root, struct Value *value, struct N
     (*root)->value = *value;
     // (*root)->left = left;
     // (*root)->right = right;
-    if ((*root)->left != NULL)
+    if ((*root)->left != NULL && (*root)->left != left)
     {
+        // printf("left = %p\n", left);
+        // printf("root = %p\n", *root);
         free((*root)->left);
         (*root)->left = left;
-        ((*root)->left)->parent_node = *root;
+        if (left != NULL)
+        {
+            ((*root)->left)->parent_node = *root;
+        }
     }
-    if ((*root)->right != NULL)
+    else
+    {
+        (*root)->left = left;
+        if (left != NULL)
+        {
+            ((*root)->left)->parent_node = *root;
+        }
+    }
+    if ((*root)->right != NULL && (*root)->right != right)
     {
         free((*root)->right);
         (*root)->right = right;
-        ((*root)->right)->parent_node = *root;
+        if (right != NULL)
+        {
+            ((*root)->right)->parent_node = *root;
+        }
+    }
+    else
+    {
+        (*root)->right = right;
+        if (right != NULL)
+        {
+            ((*root)->right)->parent_node = *root;
+        }
     }
     return NO_ERRORS;
 }
@@ -383,5 +489,10 @@ static void destructor_recursive(struct Node *root)
 
     destructor_recursive(root->left);
     destructor_recursive(root->right);
-    free(root);
+    //printf("Here\n");
+    if (root != NULL)
+    {
+        free(root);
+    }
+    root = NULL;
 }

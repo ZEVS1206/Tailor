@@ -45,7 +45,8 @@ enum Operations
     OP_ADD    = 1,
     OP_MUL    = 2,
     OP_SUB    = 3,
-    OP_DIV    = 4
+    OP_DIV    = 4,
+    OP_DEG    = 5
 };
 
 struct Value

@@ -143,7 +143,6 @@ static void create_nodes_in_dump(struct Node *root, FILE *file_pointer)
         return;
     }
 
-
     if (root->left != NULL)
     {
         create_nodes_in_dump(root->left, file_pointer);

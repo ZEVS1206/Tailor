@@ -67,6 +67,14 @@ static void transform_to_operation(const char symbol, struct Value *value)
     {
         value->operation = OP_DIV;
     }
+    else if (symbol == '^')
+    {
+        value->operation = OP_DEG;
+    }
+    else
+    {
+        value->operation = NOT_AN_OP;
+    }
     return;
 }
 
