@@ -6,6 +6,7 @@
 
 #include "tree.h"
 
+static void simplyfying_node_with_variable(struct Node **root);
 static void destructor_recursive(struct Node *root);
 static void calculation_of_subtree(struct Node **root);
 static void calculation_of_nodes(struct Value *left_value, struct Value *right_value, Operations operation, int *result);
@@ -63,6 +64,122 @@ static void try_differentiation_of_constant_and_variable(struct Node **root)
     if (!attempt)
     {
         attempt = try_differentiation_variable(root);
+    }
+    return;
+}
+
+static void simplyfying_node_with_variable(struct Node **root)
+{
+    if ((*root) == NULL)
+    {
+        return;
+    }
+    Errors_of_tree error = NO_ERRORS;
+    if ((((*root)->left)->value).type == VARIABLE && (((*root)->right)->value).type != VARIABLE)
+    {
+        struct Value new_root_value = {};
+        if (((*root)->value).operation == OP_MUL)
+        {
+            if ((((*root)->right)->value).number == 0)
+            {
+                new_root_value.type = NUMBER;
+                new_root_value.number = 0;
+            }
+            else if ((((*root)->right)->value).number == 1)
+            {
+                new_root_value.type = VARIABLE;
+                new_root_value.variable = (((*root)->left)->value).variable;
+            }
+        }
+        else if (((*root)->value).operation == OP_ADD)
+        {
+            if ((((*root)->right)->value).number == 0)
+            {
+                new_root_value.type = VARIABLE;
+                new_root_value.number = (((*root)->left)->value).variable;
+            }
+        }
+        else if (((*root)->value).operation == OP_DIV)
+        {
+            if ((((*root)->right)->value).number == 1)
+            {
+                new_root_value.type = VARIABLE;
+                new_root_value.variable = (((*root)->left)->value).variable;
+            }
+        }
+        else if(((*root)->value).operation == OP_DEG)
+        {
+            if ((((*root)->right)->value).number == 1)
+            {
+                new_root_value.type = VARIABLE;
+                new_root_value.variable = (((*root)->left)->value).variable;
+            }
+            if ((((*root)->right)->value).number == 0)
+            {
+                new_root_value.type = NUMBER;
+                new_root_value.number = 1;
+            }
+        }
+        if (new_root_value.type != UNKNOWN_TYPE)
+        {
+            error = create_new_node(root, &new_root_value, NULL, NULL);
+        }
+    }
+    else if ((((*root)->right)->value).type == VARIABLE && (((*root)->left)->value).type != VARIABLE)
+    {
+        struct Value new_root_value = {};
+        if (((*root)->value).operation == OP_MUL)
+        {
+            if ((((*root)->left)->value).number == 0)
+            {
+                new_root_value.type = NUMBER;
+                new_root_value.number = 0;
+            }
+            else if ((((*root)->left)->value).number == 1)
+            {
+                new_root_value.type = VARIABLE;
+                new_root_value.variable = (((*root)->right)->value).variable;
+            }
+        }
+        else if (((*root)->value).operation == OP_ADD)
+        {
+            if ((((*root)->left)->value).number == 0)
+            {
+                new_root_value.type = VARIABLE;
+                new_root_value.number = (((*root)->right)->value).variable;
+            }
+        }
+        if (new_root_value.type != UNKNOWN_TYPE)
+        {
+            error = create_new_node(root, &new_root_value, NULL, NULL);
+        }
+    }
+    if (error != NO_ERRORS)
+    {
+        return;
+    }
+    return;
+}
+
+
+void symplifying_tree(struct Node **root)
+{
+    if (*root == NULL)
+    {
+        return;
+    }
+    symplifying_tree(&((*root)->left));
+    symplifying_tree(&((*root)->right));
+    if (((*root)->value).type == OPERATION)
+    {
+        if ((((*root)->left)->value).type == VARIABLE || (((*root)->right)->value).type == VARIABLE)
+        {
+            simplyfying_node_with_variable(root);
+        }
+        else if ((((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == NUMBER)
+        {
+            calculation_of_subtree(root);
+        }
     }
     return;
 }
@@ -141,45 +258,6 @@ static void differentiation_sum_sub(struct Node **root)
     }
     calculation_of_subtree(root);
 }
-
-/*static void differentiation_mul_expression_and_constant(struct Node **root)
-{
-    if ((*root) == NULL)
-    {
-        return;
-    }
-    int result_differentiation = 0;
-    bool attempt = true;
-    if ((((*root)->left)->value).type == OPERATION)
-    {
-        attempt = try_differentiation_operation(&((*root)->left));
-        if ((((*root)->right)->value).type == NUMBER)
-        {
-            calculation_of_subtree(root);
-        }
-    }
-    else if ((((*root)->right)->value).type == OPERATION)
-    {
-        attempt = try_differentiation_operation(&((*root)->right));
-        if ((((*root)->left)->value).type == NUMBER)
-        {
-            calculation_of_subtree(root);
-        }
-    }
-    else
-    {
-        if ((((*root)->left)->value).type == NUMBER)
-        {
-            result_differentiation = (((*root)->left)->value).number;
-        }
-        else
-        {
-            result_differentiation = (((*root)->right)->value).number;
-        }
-        replace_node_with_number(root, result_differentiation);
-    }
-    return;
-}*/
 
 static void differentiation_mul_expressions(struct Node **root)
 {
