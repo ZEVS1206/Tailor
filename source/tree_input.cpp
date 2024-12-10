@@ -6,7 +6,14 @@
 #include "tree.h"
 #include "tree_input.h"
 
-static void parse_information_from_file(struct Node *root, char **buffer, char *end_pointer);
+static void parse_information_from_file_by_staples(struct Node *root, char **buffer, char *end_pointer);
+static void parse_information_from_file_by_recursive_descent(struct Node **root, char **buffer, char *end_pointer, int *index);
+static void get_number_from_file(struct Node **root, char **buffer, char *end_pointer, int *index);
+static void get_variable_from_file(struct Node **root, char **buffer, char *end_pointer, int *index);
+static void get_staples_expression_or_number_or_variable(struct Node **root, char **buffer, char *end_pointer, int *index);
+static void get_expression_with_plus_or_minus(struct Node **root, char **buffer, char *end_pointer, int *index);
+static void get_expression_with_mul_or_div(struct Node **root, char **buffer, char *end_pointer, int *index);
+static void syntax_error(char **buffer, int *index);
 static size_t get_size_of_file(FILE *file_pointer);
 static char * get_value_from_file(char *str, size_t size_of_str, char *buffer, char *end_pointer);
 static char * skip_spaces(char *buffer, char *end_pointer);
@@ -118,7 +125,18 @@ Errors_of_tree get_tree_from_file(struct Tree *tree, const char *file_source_nam
     fclose(file_pointer);
 
     tree->tmp_root = tree->root;
-    parse_information_from_file(tree->tmp_root, &buffer, end_pointer);
+    if (buffer[0] == '$')
+    {
+        buffer++;
+        parse_information_from_file_by_staples(tree->root, &buffer, end_pointer);
+    }
+    else
+    {
+        int index = 0;
+        parse_information_from_file_by_recursive_descent(&tree->root, &buffer, end_pointer, &index);
+        //printf("tree->root = %p\n", tree->root);
+    }
+
     free(old_buffer);
     return NO_ERRORS;
 }
@@ -139,7 +157,7 @@ static char * get_value_from_file(char *str, size_t size_of_str, char *buffer, c
     return buffer;
 }
 
-static void parse_information_from_file(struct Node *root, char **buffer, char *end_pointer)
+static void parse_information_from_file_by_staples(struct Node *root, char **buffer, char *end_pointer)
 {
     *buffer = skip_spaces(*buffer, end_pointer);
     if (*buffer >= end_pointer)
@@ -159,7 +177,7 @@ static void parse_information_from_file(struct Node *root, char **buffer, char *
         (root->left)->parent_node = root;
         ON_DEBUG(printf("go to left\n");)
         ON_DEBUG(getchar();)
-        parse_information_from_file(root->left, buffer, end_pointer);
+        parse_information_from_file_by_staples(root->left, buffer, end_pointer);
         ON_DEBUG(printf("leave left\n");)
         if (*buffer >= end_pointer)
         {
@@ -190,7 +208,7 @@ static void parse_information_from_file(struct Node *root, char **buffer, char *
         (root->right)->parent_node = root;
         ON_DEBUG(printf("go to right\n");)
         ON_DEBUG(getchar();)
-        parse_information_from_file(root->right, buffer, end_pointer);
+        parse_information_from_file_by_staples(root->right, buffer, end_pointer);
         ON_DEBUG(printf("leave right\n");)
         ON_DEBUG(getchar();)
         if (*buffer >= end_pointer)
@@ -225,6 +243,192 @@ static void parse_information_from_file(struct Node *root, char **buffer, char *
         (*buffer)++;
         return;
     }
+}
+
+static void syntax_error(char **buffer, int *index)
+{
+    printf("Syntax Error! At index %d wait %c\n", *index, *buffer[0]);
+    abort();
+}
+
+static void get_number_from_file(struct Node **root, char **buffer, char *end_pointer, int *index)
+{
+    if (*buffer == end_pointer)
+    {
+        return;
+    }
+    char *old = *buffer;
+    *buffer = skip_spaces(*buffer, end_pointer);
+    *index += *buffer - old;
+    int old_index = *index;
+    char str[100] = {0};
+    old = *buffer;
+    *buffer = get_value_from_file(str, 100, *buffer, end_pointer);
+    *index += *buffer - old;
+    if (old_index == *index)
+    {
+        syntax_error(buffer, index);
+    }
+    int value = atoi(str);
+    struct Value new_node_value = {.type = NUMBER, .number = value};
+    Errors_of_tree error = create_new_node(root, &new_node_value, NULL, NULL);
+    //printf("root = %p\n", (*root));
+    return;
+}
+
+static void get_variable_from_file(struct Node **root, char **buffer, char *end_pointer, int *index)
+{
+    if (*buffer == end_pointer)
+    {
+        return;
+    }
+    char *old = *buffer;
+    *buffer = skip_spaces(*buffer, end_pointer);
+    *index += *buffer - old;
+    int old_index = *index;
+    char str[100] = {0};
+    old = *buffer;
+    *buffer = get_value_from_file(str, 100, *buffer, end_pointer);
+    *index += *buffer - old;
+    if (old_index == *index)
+    {
+        syntax_error(buffer, index);
+    }
+    struct Value new_node_value = {.type = VARIABLE};
+    transform_to_variable(str, &new_node_value);
+    Errors_of_tree error = create_new_node(root, &new_node_value, NULL, NULL);
+    return;
+}
+
+static void get_staples_expression_or_number_or_variable(struct Node **root, char **buffer, char *end_pointer, int *index)
+{
+    if (*buffer == end_pointer)
+    {
+        return;
+    }
+    char *old = *buffer;
+    *buffer = skip_spaces(*buffer, end_pointer);
+    *index += *buffer - old;
+    if (*buffer[0] == '(')
+    {
+        (*index)++;
+        (*buffer)++;
+        get_expression_with_plus_or_minus(root, buffer, end_pointer, index);
+        if (*buffer[0] != ')')
+        {
+            syntax_error(buffer, index);
+        }
+        (*index)++;
+        (*buffer)++;
+        return;
+    }
+    else if (isalpha(*buffer[0]))
+    {
+        get_variable_from_file(root, buffer, end_pointer, index);
+        return;
+    }
+    else if (isdigit(*buffer[0]))
+    {
+        //printf("digit\n");
+        get_number_from_file(root, buffer, end_pointer, index);
+        //printf("root in staples = %p\n", (*root));
+        return;
+    }
+    return;
+}
+
+static void get_expression_with_mul_or_div(struct Node **root, char **buffer, char *end_pointer, int *index)
+{
+    if (*buffer == end_pointer)
+    {
+        return;
+    }
+    char *old = *buffer;
+    *buffer = skip_spaces(*buffer, end_pointer);
+    //printf("%c\n", *buffer[0]);
+    *index += *buffer - old;
+    struct Node *left_node = NULL;
+    struct Node *right_node = NULL;
+    get_staples_expression_or_number_or_variable(&left_node, buffer, end_pointer, index);
+    //printf("left_node = %d\n", (left_node->value).number);
+    *buffer = skip_spaces(*buffer, end_pointer);
+    *index += *buffer - old;
+    while (*buffer[0] == '*' || *buffer[0] == '/')
+    {
+        //printf("Here\n");
+        char operation = *buffer[0];
+        (*index)++;
+        (*buffer)++;
+        //printf("%c\n", *buffer[0]);
+        get_staples_expression_or_number_or_variable(&right_node, buffer, end_pointer, index);
+        struct Value new_node_value = {.type = OPERATION};
+        transform_to_operation(operation, &new_node_value);
+        Errors_of_tree error = create_new_node(root, &new_node_value, left_node, right_node);
+        //printf("root->type = %d\n", ((*root)->value).type);
+    }
+    if (right_node == NULL)
+    {
+        if (*root != NULL)
+        {
+            free(*root);
+            *root = NULL;
+        }
+        *root = left_node;
+    }
+    return;
+}
+
+static void get_expression_with_plus_or_minus(struct Node **root, char **buffer, char *end_pointer, int *index)
+{
+    if (*buffer == end_pointer)
+    {
+        return;
+    }
+    //printf("root = %p\n", *root);
+    char *old = *buffer;
+    *buffer = skip_spaces(*buffer, end_pointer);
+    *index += *buffer - old;
+    struct Node *left_node = NULL;
+    struct Node *right_node = NULL;
+    get_expression_with_mul_or_div(&left_node, buffer, end_pointer, index);
+    *buffer = skip_spaces(*buffer, end_pointer);
+    *index += *buffer - old;
+    while (*buffer[0] == '+' || *buffer[0] == '-')
+    {
+        //printf("Here\n");
+        char operation = *buffer[0];
+        (*index)++;
+        (*buffer)++;
+        get_expression_with_mul_or_div(&right_node, buffer, end_pointer, index);
+        struct Value new_node_value = {.type = OPERATION};
+        transform_to_operation(operation, &new_node_value);
+        Errors_of_tree error = create_new_node(root, &new_node_value, left_node, right_node);
+    }
+    if (right_node == NULL)
+    {
+        if (*root != NULL)
+        {
+            free(*root);
+            *root = NULL;
+        }
+        *root = left_node;
+    }
+    return;
+}
 
 
+static void parse_information_from_file_by_recursive_descent(struct Node **root, char **buffer, char *end_pointer, int *index)
+{
+    if (*root == NULL || *buffer == end_pointer)
+    {
+        return;
+    }
+
+    get_expression_with_plus_or_minus(root, buffer, end_pointer, index);
+    //printf("general root = %p\n", *root);
+    if (*buffer[0] != '$')
+    {
+        syntax_error(buffer, index);
+    }
+    return;
 }

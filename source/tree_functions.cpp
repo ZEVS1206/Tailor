@@ -25,9 +25,8 @@ static bool try_differentiation_constant(struct Node **root);
 static bool try_differentiation_variable(struct Node **root);
 static bool try_differentiation_operation(struct Node **root);
 static void try_differentiation_of_constant_and_variable(struct Node **root);
-static struct Node* copy_node(struct Node *root, struct Node *parent);
 
-static struct Node* copy_node(struct Node *root, struct Node *parent)
+struct Node* copy_node(struct Node *root, struct Node *parent)
 {
     if (root == NULL)
     {

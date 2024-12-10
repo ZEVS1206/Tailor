@@ -80,5 +80,6 @@ Errors_of_tree tree_destructor(struct Tree *tree);
 void differentiation(struct Node *root);
 void calculation_of_tree(struct Node *root);
 Errors_of_tree create_new_node(struct Node **root, struct Value *value, struct Node *left, struct Node *right);
+struct Node* copy_node(struct Node *root, struct Node *parent);
 void symplifying_tree(struct Node **root);
 #endif

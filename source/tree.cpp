@@ -143,7 +143,7 @@ int main()
         fprintf(stderr, "error = %d\n", tree.error);
         return 1;
     }
-    //differentiation(tree.root);
+    differentiation(tree.root);
     //calculation_of_tree(tree.tmp_root);
     if (tree.error != NO_ERRORS)
     {
@@ -151,7 +151,7 @@ int main()
         return 1;
     }
     //graphic_dump(&tree, "after_calculation");
-    //graphic_dump(&tree, "after_differentiation");
+    graphic_dump(&tree, "after_differentiation");
     symplifying_tree(&(tree.root));
     graphic_dump(&tree, "after_symplifying");
     error = tree_destructor(&tree);
