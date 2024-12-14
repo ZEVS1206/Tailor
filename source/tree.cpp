@@ -113,6 +113,8 @@ int main()
     // printf("answer = %d\n", ans);
     struct Tree tree = {0};
     Errors_of_tree error = NO_ERRORS;
+    //char all_operations[] = {'+', '-', '*', '/', '^'}; // diff_allowed_operation.txt: '+', '-', '*', '/', '^'
+    //size_t size_of_all_operations = sizeof(all_operations) / sizeof(all_operations[0]);
     error = tree_constructor(&tree);
     if (error != NO_ERRORS)
     {
@@ -125,8 +127,9 @@ int main()
         fprintf(stderr, "error = %d\n", error);
         return 1;
     }
+    //create_operations_interface(tree.interface, all_operations);
     tree.tmp_root = tree.root;
-    // struct Value new_value = {.type = OPERATION, .operation = OP_ADD};
+    // struct Value new_value = {.type = OPERATION,operations .operation = OP_ADD};
     // struct Node *new_left_node = (Node *) calloc(1, sizeof(Node));
     // struct Node *new_right_node = (Node *) calloc(1, sizeof(Node));
     // new_left_node->parent_node = (tree.tmp_root)->left;

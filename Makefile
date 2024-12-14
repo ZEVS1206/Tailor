@@ -4,6 +4,7 @@ CFLAGS=-ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-loop-optimizati
 SOURCE_DIR = source
 BUILD_DIR = build
 DUMP_DIR = dump
+TEX_DUMP_DIR = tex_dump
 HEADERS_DIR = include
 INCLUDE= -I include
 CFLAGS+=$(INCLUDE)
@@ -26,10 +27,12 @@ $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp | $(BUILD_DIR)
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(DUMP_DIR)
+	mkdir -p $(TEX_DUMP_DIR)
 
 clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf $(DUMP_DIR)
+	rm -rf $(TEX_DUMP_DIR)
 
 run:
 	$(BUILD_DIR)/$(EXEC_NAME)

@@ -13,12 +13,13 @@ static void get_variable_from_file(struct Node **root, char **buffer, char *end_
 static void get_staples_expression_or_number_or_variable(struct Node **root, char **buffer, char *end_pointer, int *index);
 static void get_expression_with_plus_or_minus(struct Node **root, char **buffer, char *end_pointer, int *index);
 static void get_expression_with_mul_or_div(struct Node **root, char **buffer, char *end_pointer, int *index);
+static void get_expression_with_pow(struct Node **root, char **buffer, char *end_pointer, int *index);
 static void syntax_error(char **buffer, int *index);
 static size_t get_size_of_file(FILE *file_pointer);
 static char * get_value_from_file(char *str, size_t size_of_str, char *buffer, char *end_pointer);
 static char * skip_spaces(char *buffer, char *end_pointer);
 static void transform_to_variable(const char *str, struct Value *value);
-static void transform_to_operation(const char symbol, struct Value *value);
+
 
 static char * skip_spaces(char *buffer, char *end_pointer)
 {
@@ -52,35 +53,20 @@ static void transform_to_variable(const char *str, struct Value *value)
     return;
 }
 
-static void transform_to_operation(const char symbol, struct Value *value)
+void transform_to_operation(const char symbol, struct Value *value)
 {
     if (value == NULL)
     {
         return;
     }
-    if (symbol == '+')
+    switch (symbol)
     {
-        value->operation = OP_ADD;
-    }
-    else if (symbol == '-')
-    {
-        value->operation = OP_SUB;
-    }
-    else if (symbol == '*')
-    {
-        value->operation = OP_MUL;
-    }
-    else if (symbol == '/')
-    {
-        value->operation = OP_DIV;
-    }
-    else if (symbol == '^')
-    {
-        value->operation = OP_DEG;
-    }
-    else
-    {
-        value->operation = NOT_AN_OP;
+        case '+':value->operation = OP_ADD; break;
+        case '-':value->operation = OP_SUB; break;
+        case '*':value->operation = OP_MUL; break;
+        case '/':value->operation = OP_DIV; break;
+        case '^':value->operation = OP_DEG; break;
+        default: value->operation = NOT_AN_OP; break;
     }
     return;
 }
@@ -336,8 +322,7 @@ static void get_staples_expression_or_number_or_variable(struct Node **root, cha
     }
     return;
 }
-
-static void get_expression_with_mul_or_div(struct Node **root, char **buffer, char *end_pointer, int *index)
+static void get_expression_with_pow(struct Node **root, char **buffer, char *end_pointer, int *index)
 {
     if (*buffer == end_pointer)
     {
@@ -350,10 +335,11 @@ static void get_expression_with_mul_or_div(struct Node **root, char **buffer, ch
     struct Node *left_node = NULL;
     struct Node *right_node = NULL;
     get_staples_expression_or_number_or_variable(&left_node, buffer, end_pointer, index);
+    ON_DEBUG(printf("left_node in pow = %p\n", left_node);)
     //printf("left_node = %d\n", (left_node->value).number);
     *buffer = skip_spaces(*buffer, end_pointer);
     *index += *buffer - old;
-    while (*buffer[0] == '*' || *buffer[0] == '/')
+    while (*buffer[0] == '^')
     {
         //printf("Here\n");
         char operation = *buffer[0];
@@ -368,12 +354,58 @@ static void get_expression_with_mul_or_div(struct Node **root, char **buffer, ch
     }
     if (right_node == NULL)
     {
-        if (*root != NULL)
-        {
-            free(*root);
-            *root = NULL;
-        }
+        ON_DEBUG(printf("left_node in pow if right_node null = %p\n", left_node);)
+        // if (*root != NULL)
+        // {
+        //     free(*root);
+        //     *root = NULL;
+        // }
         *root = left_node;
+        //*root = copy_node(left_node, NULL);
+    }
+    return;
+}
+
+static void get_expression_with_mul_or_div(struct Node **root, char **buffer, char *end_pointer, int *index)
+{
+    if (*buffer == end_pointer)
+    {
+        return;
+    }
+    char *old = *buffer;
+    *buffer = skip_spaces(*buffer, end_pointer);
+    //printf("%c\n", *buffer[0]);
+    *index += *buffer - old;
+    struct Node *left_node = NULL;
+    struct Node *right_node = NULL;
+    get_expression_with_pow(&left_node, buffer, end_pointer, index);
+    ON_DEBUG(printf("left_node in mul or div = %p\n", left_node);)
+    //printf("left_node = %d\n", (left_node->value).number);
+    *buffer = skip_spaces(*buffer, end_pointer);
+    *index += *buffer - old;
+    while (*buffer[0] == '*' || *buffer[0] == '/')
+    {
+        //printf("Here\n");
+        char operation = *buffer[0];
+        (*index)++;
+        (*buffer)++;
+        //printf("%c\n", *buffer[0]);
+        get_expression_with_pow(&right_node, buffer, end_pointer, index);
+        struct Value new_node_value = {.type = OPERATION};
+        transform_to_operation(operation, &new_node_value);
+        Errors_of_tree error = create_new_node(root, &new_node_value, left_node, right_node);
+        //printf("root->type = %d\n", ((*root)->value).type);
+    }
+    if (right_node == NULL)
+    {
+        ON_DEBUG(printf("left_node in mul or div if right_node null = %p\n", left_node);)
+        // if (*root != NULL)
+        // {
+        //     free(*root);
+        //     *root = NULL;
+        // }
+        *root = left_node;
+        //*root = copy_node(left_node, NULL);
     }
     return;
 }
@@ -391,6 +423,7 @@ static void get_expression_with_plus_or_minus(struct Node **root, char **buffer,
     struct Node *left_node = NULL;
     struct Node *right_node = NULL;
     get_expression_with_mul_or_div(&left_node, buffer, end_pointer, index);
+    ON_DEBUG(printf("left_node in plus or minus = %p\n", left_node);)
     *buffer = skip_spaces(*buffer, end_pointer);
     *index += *buffer - old;
     while (*buffer[0] == '+' || *buffer[0] == '-')
@@ -406,12 +439,14 @@ static void get_expression_with_plus_or_minus(struct Node **root, char **buffer,
     }
     if (right_node == NULL)
     {
-        if (*root != NULL)
-        {
-            free(*root);
-            *root = NULL;
-        }
+        ON_DEBUG(printf("left_node in plus or minus if right_node null = %p\n", left_node);)
+        // if (*root != NULL)
+        // {
+        //     free(*root);
+        //     *root = NULL;
+        // }
         *root = left_node;
+        //*root = copy_node(left_node, NULL);
     }
     return;
 }

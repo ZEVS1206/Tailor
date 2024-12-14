@@ -2,11 +2,18 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <assert.h>
 #include <math.h>
 
 #include "tree.h"
+#include "tree_input.h"
 
 static void simplyfying_node_with_variable(struct Node **root);
+static void simplyfying_node_with_plus_or_minus(struct Node **root);
+static void simplyfying_node_with_mul(struct Node **root);
+static void simplyfying_node_with_div(struct Node **root);
+static void simplyfying_node_with_pow(struct Node **root);
+static void create_value(struct Value *root_value, struct Value *new_value);
 static void destructor_recursive(struct Node *root);
 static void calculation_of_subtree(struct Node **root);
 static void calculation_of_nodes(struct Value *left_value, struct Value *right_value, Operations operation, int *result);
@@ -18,13 +25,43 @@ static void differentiation_mul(struct Node **root);
 static void differentiation_mul_expressions(struct Node **root);
 static void differentiation_pow_expression(struct Node **root);
 static void differentiation_pow(struct Node **root);
-//static void differentiation_mul_expression_and_constant(struct Node **root);
 static void differentiation_div(struct Node **root);
 static void replace_node_with_number(struct Node **root, int number);
 static bool try_differentiation_constant(struct Node **root);
 static bool try_differentiation_variable(struct Node **root);
 static bool try_differentiation_operation(struct Node **root);
 static void try_differentiation_of_constant_and_variable(struct Node **root);
+static void fill_interface(struct Operation_interface *operation);
+static bool is_node_number(const struct Node *root, int number);
+
+const struct Operation_interface K_operations[] =
+{
+    {simplyfying_node_with_plus_or_minus, differentiation_sum_sub,        calculation_of_subtree, OP_ADD},
+    {simplyfying_node_with_plus_or_minus, differentiation_sum_sub,        calculation_of_subtree, OP_SUB},
+    {simplyfying_node_with_mul,           differentiation_mul,            calculation_of_subtree, OP_MUL},
+    {simplyfying_node_with_div,           differentiation_div,            calculation_of_subtree, OP_DIV},
+    {simplyfying_node_with_pow,      differentiation_pow_expression, calculation_of_subtree, OP_DEG}
+};
+
+const size_t size_of_operations = sizeof(K_operations) / sizeof(K_operations[0]);
+
+static void create_value(struct Value *root_value, struct Value *new_value)
+{
+    if (root_value == NULL || new_value == NULL)
+    {
+        return;
+    }
+    new_value->type = root_value->type;
+    switch(new_value->type)
+    {
+        case VARIABLE:  new_value->variable  = root_value->variable;  break;
+        case NUMBER:    new_value->number    = root_value->number;    break;
+        case OPERATION: new_value->operation = root_value->operation; break;
+    }
+    return;
+}
+
+
 
 struct Node* copy_node(struct Node *root, struct Node *parent)
 {
@@ -67,98 +104,157 @@ static void try_differentiation_of_constant_and_variable(struct Node **root)
     return;
 }
 
-static void simplyfying_node_with_variable(struct Node **root)
+static bool is_node_number(const struct Node *root, int number)
+{
+    if (root == NULL)
+    {
+        return false;
+    }
+    if ((root->value).type == NUMBER && (root->value).number == number)
+    {
+        return true;
+    }
+    return false;
+}
+
+
+static void simplyfying_node_with_plus_or_minus(struct Node **root)
 {
     if ((*root) == NULL)
     {
         return;
     }
+    assert(((*root)->value).type == OPERATION);
+    assert(((*root)->value).operation == OP_ADD || ((*root)->value).operation == OP_SUB);
+
+    if ((((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == NUMBER)
+    {
+        return calculation_of_subtree(root);
+    }
+
+    struct Value new_root_value = {};
     Errors_of_tree error = NO_ERRORS;
-    if ((((*root)->left)->value).type == VARIABLE && (((*root)->right)->value).type != VARIABLE)
+    if (is_node_number((*root)->left, 0))
     {
-        struct Value new_root_value = {};
-        if (((*root)->value).operation == OP_MUL)
-        {
-            if ((((*root)->right)->value).number == 0)
-            {
-                new_root_value.type = NUMBER;
-                new_root_value.number = 0;
-            }
-            else if ((((*root)->right)->value).number == 1)
-            {
-                new_root_value.type = VARIABLE;
-                new_root_value.variable = (((*root)->left)->value).variable;
-            }
-        }
-        else if (((*root)->value).operation == OP_ADD)
-        {
-            if ((((*root)->right)->value).number == 0)
-            {
-                new_root_value.type = VARIABLE;
-                new_root_value.number = (((*root)->left)->value).variable;
-            }
-        }
-        else if (((*root)->value).operation == OP_DIV)
-        {
-            if ((((*root)->right)->value).number == 1)
-            {
-                new_root_value.type = VARIABLE;
-                new_root_value.variable = (((*root)->left)->value).variable;
-            }
-        }
-        else if(((*root)->value).operation == OP_DEG)
-        {
-            if ((((*root)->right)->value).number == 1)
-            {
-                new_root_value.type = VARIABLE;
-                new_root_value.variable = (((*root)->left)->value).variable;
-            }
-            if ((((*root)->right)->value).number == 0)
-            {
-                new_root_value.type = NUMBER;
-                new_root_value.number = 1;
-            }
-        }
-        if (new_root_value.type != UNKNOWN_TYPE)
-        {
-            error = create_new_node(root, &new_root_value, NULL, NULL);
-        }
+        create_value(&(((*root)->right)->value), &new_root_value);
+        error = create_new_node(root, &new_root_value, ((*root)->right)->left, ((*root)->right)->right);
     }
-    else if ((((*root)->right)->value).type == VARIABLE && (((*root)->left)->value).type != VARIABLE)
+    else if (is_node_number((*root)->right, 0))
     {
-        struct Value new_root_value = {};
-        if (((*root)->value).operation == OP_MUL)
-        {
-            if ((((*root)->left)->value).number == 0)
-            {
-                new_root_value.type = NUMBER;
-                new_root_value.number = 0;
-            }
-            else if ((((*root)->left)->value).number == 1)
-            {
-                new_root_value.type = VARIABLE;
-                new_root_value.variable = (((*root)->right)->value).variable;
-            }
-        }
-        else if (((*root)->value).operation == OP_ADD)
-        {
-            if ((((*root)->left)->value).number == 0)
-            {
-                new_root_value.type = VARIABLE;
-                new_root_value.number = (((*root)->right)->value).variable;
-            }
-        }
-        if (new_root_value.type != UNKNOWN_TYPE)
-        {
-            error = create_new_node(root, &new_root_value, NULL, NULL);
-        }
+        create_value(&(((*root)->left)->value), &new_root_value);
+        error = create_new_node(root, &new_root_value, ((*root)->left)->left, ((*root)->left)->right);
     }
-    if (error != NO_ERRORS)
+}
+
+static void simplyfying_node_with_mul(struct Node **root)
+{
+    if ((*root) == NULL)
     {
         return;
     }
+    assert(((*root)->value).type == OPERATION);
+    assert(((*root)->value).operation == OP_MUL);
+    if ((((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == NUMBER)
+    {
+        return calculation_of_subtree(root);
+    }
+
+    struct Value new_root_value = {};
+    Errors_of_tree error = NO_ERRORS;
+    if (is_node_number((*root)->left, 0) || is_node_number((*root)->right, 0))
+    {
+        new_root_value.type = NUMBER;
+        new_root_value.number = 0;
+        error = create_new_node(root, &new_root_value, NULL, NULL);
+        return;
+    }
+
+    if (is_node_number((*root)->left, 1))
+    {
+        create_value(&(((*root)->right)->value), &new_root_value);
+        error = create_new_node(root, &new_root_value, ((*root)->right)->left, ((*root)->right)->right);
+    }
+    else if (is_node_number((*root)->right, 1))
+    {
+        create_value(&(((*root)->left)->value), &new_root_value);
+        error = create_new_node(root, &new_root_value, ((*root)->left)->left, ((*root)->left)->right);
+    }
     return;
 }
+
+static void simplyfying_node_with_div(struct Node **root)
+{
+    if ((*root) == NULL)
+    {
+        return;
+    }
+
+    assert(((*root)->value).type == OPERATION);
+    assert(((*root)->value).operation == OP_DIV);
+
+    if (is_node_number((*root)->right, 0))
+    {
+        printf("Error! Division by Zero!\n");
+        return;
+    }
+
+    if ((((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == NUMBER)
+    {
+        return calculation_of_subtree(root);
+    }
+
+    struct Value new_root_value = {};
+    Errors_of_tree error = NO_ERRORS;
+    if (is_node_number((*root)->left, 0))
+    {
+        new_root_value.type = NUMBER;
+        new_root_value.number = 0;
+        error = create_new_node(root, &new_root_value, NULL, NULL);
+        return;
+    }
+
+    if (is_node_number((*root)->right, 1))
+    {
+        create_value(&(((*root)->left)->value), &new_root_value);
+        error = create_new_node(root, &new_root_value, ((*root)->left)->left, ((*root)->left)->right);
+    }
+    return;
+}
+
+static void simplyfying_node_with_pow(struct Node **root)
+{
+    if ((*root) == NULL)
+    {
+        return;
+    }
+    assert(((*root)->value).type == OPERATION);
+    assert(((*root)->value).operation == OP_DEG);
+
+    if ((((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == NUMBER)
+    {
+        return calculation_of_subtree(root);
+    }
+
+    struct Value new_root_value = {};
+    Errors_of_tree error = NO_ERRORS;
+
+
+    if (is_node_number((*root)->right, 0))
+    {
+        new_root_value.type = NUMBER;
+        new_root_value.number = 1;
+        error = create_new_node(root, &new_root_value, NULL, NULL);
+        return;
+    }
+
+    if (is_node_number((*root)->right, 1))
+    {
+        create_value(&(((*root)->left)->value), &new_root_value);
+        error = create_new_node(root, &new_root_value, ((*root)->left)->left, ((*root)->left)->right);
+    }
+    return;
+}
+
 
 
 void symplifying_tree(struct Node **root)
@@ -171,14 +267,26 @@ void symplifying_tree(struct Node **root)
     symplifying_tree(&((*root)->right));
     if (((*root)->value).type == OPERATION)
     {
-        if ((((*root)->left)->value).type == VARIABLE || (((*root)->right)->value).type == VARIABLE)
+        for (size_t index = 0; index < size_of_operations; index++)
         {
-            simplyfying_node_with_variable(root);
+            if (K_operations[index].operation_type == ((*root)->value).operation)
+            {
+                K_operations[index].symplifying_tree(root);
+                break;
+            }
         }
-        else if ((((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == NUMBER)
-        {
-            calculation_of_subtree(root);
-        }
+        // if (((*root)->value).operation == OP_ADD)
+        // {
+        //     simplyfying_node_with_plus_or_minus(root);
+        // }
+        // else if ((((*root)->left)->value).type != NUMBER || (((*root)->right)->value).type != NUMBER)
+        // {
+        //     simplyfying_node_with_variable(root);
+        // }
+        // else if ((((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == NUMBER)
+        // {
+        //     calculation_of_subtree(root);
+        // }
     }
     return;
 }
@@ -255,7 +363,7 @@ static void differentiation_sum_sub(struct Node **root)
     {
         try_differentiation_of_constant_and_variable(&((*root)->right));
     }
-    calculation_of_subtree(root);
+    //calculation_of_subtree(root);
 }
 
 static void differentiation_mul_expressions(struct Node **root)
@@ -386,15 +494,23 @@ static void differentiation_of_operation(struct Node **root)
     {
         return;
     }
-    switch (((*root)->value).operation)
+    for (size_t index = 0; index < size_of_operations; index++)
     {
-        case OP_ADD: differentiation_sum_sub  (root); break;
-        case OP_SUB: differentiation_sum_sub  (root); break;
-        case OP_MUL: differentiation_mul      (root); break;
-        case OP_DIV: differentiation_div      (root); break;
-        case OP_DEG: differentiation_pow      (root); break;
-        default: break;
+        if (K_operations[index].operation_type == ((*root)->value).operation)
+        {
+            K_operations[index].differentiation(root);
+            break;
+        }
     }
+    // switch (((*root)->value).operation)
+    // {
+    //     case OP_ADD: differentiation_sum_sub  (root); break;
+    //     case OP_SUB: differentiation_sum_sub  (root); break;
+    //     case OP_MUL: differentiation_mul      (root); break;
+    //     case OP_DIV: differentiation_div      (root); break;
+    //     case OP_DEG: differentiation_pow      (root); break;
+    //     default: break;
+    // }
     return;
 }
 
@@ -571,6 +687,7 @@ Errors_of_tree create_new_node(struct Node **root, struct Value *value, struct N
     }
     if ((*root)->right != NULL && (*root)->right != right)
     {
+
         free((*root)->right);
         (*root)->right = right;
         if (right != NULL)
@@ -596,6 +713,17 @@ Errors_of_tree tree_constructor(struct Tree *tree)
     {
         return ERROR_OF_CONSTRUCTOR;
     }
+    //tree->interface = (struct List_of_operations *) calloc(1, sizeof(struct List_of_operations));
+    // if (tree->interface == NULL)
+    // {
+    //     return ERROR_OF_CONSTRUCTOR;
+    // }
+    // (tree->interface)->size_of_operations = size_of_all_operations;
+    // (tree->interface)->operations = (struct Operation_interface *) calloc((tree->interface)->size_of_operations, sizeof(struct Operation_interface));
+    // if ((tree->interface)->operations == NULL)
+    // {
+    //     return ERROR_OF_CONSTRUCTOR;
+    // }
     tree->error = NO_ERRORS;
     tree->root = (Node *) calloc(1, sizeof(Node));
     if (tree->root == NULL)
