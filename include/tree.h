@@ -11,6 +11,13 @@
 #define ON_DEBUG(...)
 #endif
 
+enum Mods_of_start
+{
+    UNKNOWN_MODE     = 0,
+    DIFFERENTIATION = 1,
+    CALCULATION      = 2
+};
+
 enum Errors_of_tree
 {
     NO_ERRORS                            =  0,
@@ -65,9 +72,9 @@ struct Value
 
 struct Operation_interface
 {
-    void (*symplifying_tree)    (struct Node **root);
-    void (*differentiation)     (struct Node **root);
-    void (*calculation_of_tree) (struct Node **root);
+    void (*symplifying_tree)    (struct Node **root, FILE *file_pointer);
+    void (*differentiation)     (struct Node **root, FILE *file_pointer);
+    void (*calculation_of_tree) (struct Node **root, FILE *file_pointer);
     Operations operation_type;
 };
 
@@ -89,8 +96,8 @@ struct Tree
 
 Errors_of_tree tree_constructor(struct Tree *tree);
 Errors_of_tree tree_destructor(struct Tree *tree);
-void differentiation(struct Node *root);
-void calculation_of_tree(struct Node *root);
+void differentiation(struct Node *root, FILE *file_pointer);
+void calculation_of_tree(struct Node *root, FILE *file_pointer);
 Errors_of_tree create_new_node(struct Node **root, struct Value *value, struct Node *left, struct Node *right);
 //Errors_of_tree create_operations_interface(struct List_of_operations *interface, char *all_operations);
 struct Node* copy_node(struct Node *root, struct Node *parent);

@@ -3,7 +3,10 @@
 
 #include "tree.h"
 #include "tree_dump.h"
+#include "tree_tex_dump.h"
 #include "tree_input.h"
+
+static void get_mode(Mods_of_start *mode);
 
 // const char *s = "(2*3)*(1+3)+50$";
 //
@@ -107,8 +110,25 @@
 //     }
 // }
 
+static void get_mode(Mods_of_start *mode)
+{
+    printf("Please, choose mode for smart calculator:\n");
+    printf("differentation - 1\ncalculation - 2\n");
+    scanf("%d", mode);
+    while (*mode != DIFFERENTIATION && *mode != CALCULATION)
+    {
+        printf("Please, enter another variant!\n");
+        while(getchar() != '\n');
+        scanf("%d", mode);
+    }
+    return;
+}
+
+
 int main()
 {
+    Mods_of_start mode = UNKNOWN_MODE;
+    get_mode(&mode);
     // int ans = get_g();
     // printf("answer = %d\n", ans);
     struct Tree tree = {0};
@@ -121,7 +141,24 @@ int main()
         fprintf(stderr, "error = %d\n", error);
         return error;
     }
-    error = get_tree_from_file(&tree, "source/input.txt");
+    const char *latex_file_name = "tex_dump/example.tex";
+    FILE *latex_file_pointer = fopen(latex_file_name, "w");
+    fclose(latex_file_pointer);
+    latex_file_pointer = fopen(latex_file_name, "a");
+    error = create_latex_file(latex_file_pointer);
+    if (error != NO_ERRORS)
+    {
+        fprintf(stderr, "error = %d\n", error);
+        return 1;
+    }
+    error = get_tree_from_file(&tree, "source/input.txt", latex_file_pointer, mode);
+    if (error != NO_ERRORS)
+    {
+        fprintf(stderr, "error = %d\n", error);
+        return 1;
+    }
+    //printf("root information:\nroot.number = %d\nroot.operation = %d, root.variable = %d\n", (((tree.root)->left)->value).number, (((tree.root)->left)->value).operation, (((tree.root)->left)->value).variable);
+    //error = close_latex_file(latex_file_pointer);
     if (error != NO_ERRORS)
     {
         fprintf(stderr, "error = %d\n", error);
@@ -146,17 +183,23 @@ int main()
         fprintf(stderr, "error = %d\n", tree.error);
         return 1;
     }
-    differentiation(tree.root);
-    //calculation_of_tree(tree.tmp_root);
+    //differentiation(tree.root, latex_file_pointer);
+    calculation_of_tree(tree.tmp_root, latex_file_pointer);
     if (tree.error != NO_ERRORS)
     {
         fprintf(stderr, "error = %d\n", tree.error);
         return 1;
     }
-    //graphic_dump(&tree, "after_calculation");
-    graphic_dump(&tree, "after_differentiation");
-    symplifying_tree(&(tree.root));
-    graphic_dump(&tree, "after_symplifying");
+    graphic_dump(&tree, "after_calculation");
+    //graphic_dump(&tree, "after_differentiation");
+    //symplifying_tree(&(tree.root));
+    //graphic_dump(&tree, "after_symplifying");
+    error = close_latex_file(latex_file_pointer);
+    if (error != NO_ERRORS)
+    {
+        fprintf(stderr, "error = %d\n", error);
+        return 1;
+    }
     error = tree_destructor(&tree);
     if (error != NO_ERRORS)
     {

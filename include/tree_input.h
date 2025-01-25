@@ -3,13 +3,7 @@
 
 #include "tree.h"
 
-struct Parts_of_tree
-{
-    struct Node *root;
-    struct Node *left;
-    struct Node *right;
-};
 
-Errors_of_tree get_tree_from_file(struct Tree *tree, const char *file_source_name);
+Errors_of_tree get_tree_from_file(struct Tree *tree, const char *file_source_name, FILE *latex_file_pointer, Mods_of_start mode);
 void transform_to_operation(const char symbol, struct Value *value);
 #endif

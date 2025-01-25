@@ -7,29 +7,30 @@
 
 #include "tree.h"
 #include "tree_input.h"
+#include "tree_tex_dump.h"
 
-static void simplyfying_node_with_variable(struct Node **root);
-static void simplyfying_node_with_plus_or_minus(struct Node **root);
-static void simplyfying_node_with_mul(struct Node **root);
-static void simplyfying_node_with_div(struct Node **root);
-static void simplyfying_node_with_pow(struct Node **root);
+static void simplyfying_node_with_variable(struct Node **root, FILE *file_pointer);
+static void simplyfying_node_with_plus_or_minus(struct Node **root, FILE *file_pointer);
+static void simplyfying_node_with_mul(struct Node **root, FILE *file_pointer);
+static void simplyfying_node_with_div(struct Node **root, FILE *file_pointer);
+static void simplyfying_node_with_pow(struct Node **root, FILE *file_pointer);
 static void create_value(struct Value *root_value, struct Value *new_value);
 static void destructor_recursive(struct Node *root);
-static void calculation_of_subtree(struct Node **root);
+static void calculation_of_subtree(struct Node **root, FILE *file_pointer);
 static void calculation_of_nodes(struct Value *left_value, struct Value *right_value, Operations operation, int *result);
 static void differentiation_of_constant(struct Node **root);
 static void differentiation_of_variable(struct Node **root);
 static void differentiation_of_operation(struct Node **root);
-static void differentiation_sum_sub(struct Node **root);
-static void differentiation_mul(struct Node **root);
-static void differentiation_mul_expressions(struct Node **root);
-static void differentiation_pow_expression(struct Node **root);
-static void differentiation_pow(struct Node **root);
-static void differentiation_div(struct Node **root);
+static void differentiation_sum_sub(struct Node **root, FILE *file_pointer);
+static void differentiation_mul(struct Node **root, FILE *file_pointer);
+static void differentiation_mul_expressions(struct Node **root, FILE *file_pointer);
+static void differentiation_pow_expression(struct Node **root, FILE *file_pointer);
+static void differentiation_pow(struct Node **root, FILE *file_pointer);
+static void differentiation_div(struct Node **root, FILE *file_pointer);
 static void replace_node_with_number(struct Node **root, int number);
 static bool try_differentiation_constant(struct Node **root);
 static bool try_differentiation_variable(struct Node **root);
-static bool try_differentiation_operation(struct Node **root);
+static bool try_differentiation_operation(struct Node **root, FILE *file_pointer);
 static void try_differentiation_of_constant_and_variable(struct Node **root);
 static void fill_interface(struct Operation_interface *operation);
 static bool is_node_number(const struct Node *root, int number);
@@ -40,7 +41,7 @@ const struct Operation_interface K_operations[] =
     {simplyfying_node_with_plus_or_minus, differentiation_sum_sub,        calculation_of_subtree, OP_SUB},
     {simplyfying_node_with_mul,           differentiation_mul,            calculation_of_subtree, OP_MUL},
     {simplyfying_node_with_div,           differentiation_div,            calculation_of_subtree, OP_DIV},
-    {simplyfying_node_with_pow,      differentiation_pow_expression, calculation_of_subtree, OP_DEG}
+    {simplyfying_node_with_pow,           differentiation_pow_expression, calculation_of_subtree, OP_DEG}
 };
 
 const size_t size_of_operations = sizeof(K_operations) / sizeof(K_operations[0]);
@@ -118,7 +119,7 @@ static bool is_node_number(const struct Node *root, int number)
 }
 
 
-static void simplyfying_node_with_plus_or_minus(struct Node **root)
+static void simplyfying_node_with_plus_or_minus(struct Node **root, FILE *file_pointer)
 {
     if ((*root) == NULL)
     {
@@ -129,7 +130,7 @@ static void simplyfying_node_with_plus_or_minus(struct Node **root)
 
     if ((((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == NUMBER)
     {
-        return calculation_of_subtree(root);
+        return calculation_of_subtree(root, file_pointer);
     }
 
     struct Value new_root_value = {};
@@ -146,7 +147,7 @@ static void simplyfying_node_with_plus_or_minus(struct Node **root)
     }
 }
 
-static void simplyfying_node_with_mul(struct Node **root)
+static void simplyfying_node_with_mul(struct Node **root, FILE *file_pointer)
 {
     if ((*root) == NULL)
     {
@@ -156,7 +157,7 @@ static void simplyfying_node_with_mul(struct Node **root)
     assert(((*root)->value).operation == OP_MUL);
     if ((((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == NUMBER)
     {
-        return calculation_of_subtree(root);
+        return calculation_of_subtree(root, file_pointer);
     }
 
     struct Value new_root_value = {};
@@ -182,7 +183,7 @@ static void simplyfying_node_with_mul(struct Node **root)
     return;
 }
 
-static void simplyfying_node_with_div(struct Node **root)
+static void simplyfying_node_with_div(struct Node **root, FILE *file_pointer)
 {
     if ((*root) == NULL)
     {
@@ -200,7 +201,7 @@ static void simplyfying_node_with_div(struct Node **root)
 
     if ((((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == NUMBER)
     {
-        return calculation_of_subtree(root);
+        return calculation_of_subtree(root, file_pointer);
     }
 
     struct Value new_root_value = {};
@@ -221,7 +222,7 @@ static void simplyfying_node_with_div(struct Node **root)
     return;
 }
 
-static void simplyfying_node_with_pow(struct Node **root)
+static void simplyfying_node_with_pow(struct Node **root, FILE *file_pointer)
 {
     if ((*root) == NULL)
     {
@@ -232,7 +233,7 @@ static void simplyfying_node_with_pow(struct Node **root)
 
     if ((((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == NUMBER)
     {
-        return calculation_of_subtree(root);
+        return calculation_of_subtree(root, file_pointer);
     }
 
     struct Value new_root_value = {};
@@ -257,21 +258,21 @@ static void simplyfying_node_with_pow(struct Node **root)
 
 
 
-void symplifying_tree(struct Node **root)
+void symplifying_tree(struct Node **root, FILE *file_pointer)
 {
     if (*root == NULL)
     {
         return;
     }
-    symplifying_tree(&((*root)->left));
-    symplifying_tree(&((*root)->right));
+    symplifying_tree(&((*root)->left), file_pointer);
+    symplifying_tree(&((*root)->right), file_pointer);
     if (((*root)->value).type == OPERATION)
     {
         for (size_t index = 0; index < size_of_operations; index++)
         {
             if (K_operations[index].operation_type == ((*root)->value).operation)
             {
-                K_operations[index].symplifying_tree(root);
+                K_operations[index].symplifying_tree(root, file_pointer);
                 break;
             }
         }
@@ -291,7 +292,7 @@ void symplifying_tree(struct Node **root)
     return;
 }
 
-static void differentiation_div(struct Node **root)
+static void differentiation_div(struct Node **root, FILE *file_pointer)
 {
     if ((*root) == NULL)
     {
@@ -302,8 +303,8 @@ static void differentiation_div(struct Node **root)
     struct Node *old_right = copy_node((*root)->right, *root);
     struct Node *denominator_node_left = copy_node((*root)->right, *root);
     struct Node *denominator_node_right = copy_node((*root)->right, *root);
-    differentiation((*root)->left);
-    differentiation((*root)->right);
+    differentiation((*root)->left, file_pointer);
+    differentiation((*root)->right, file_pointer);
     struct Node *diffirentiation_left = copy_node((*root)->left, *root);
     struct Node *diffirentiation_right = copy_node((*root)->right, *root);
     struct Value new_root_value = {.type = OPERATION, .operation = OP_DIV};
@@ -339,7 +340,7 @@ static void differentiation_div(struct Node **root)
     return;
 }
 
-static void differentiation_sum_sub(struct Node **root)
+static void differentiation_sum_sub(struct Node **root, FILE *file_pointer)
 {
     if ((*root) == NULL)
     {
@@ -348,7 +349,7 @@ static void differentiation_sum_sub(struct Node **root)
     bool attempt = true;
     if ((((*root)->left)->value).type == OPERATION)
     {
-        attempt = try_differentiation_operation(&((*root)->left));
+        attempt = try_differentiation_operation(&((*root)->left), file_pointer);
     }
     else
     {
@@ -357,7 +358,7 @@ static void differentiation_sum_sub(struct Node **root)
 
     if ((((*root)->right)->value).type == OPERATION)
     {
-        attempt = try_differentiation_operation(&((*root)->right));
+        attempt = try_differentiation_operation(&((*root)->right), file_pointer);
     }
     else
     {
@@ -366,7 +367,7 @@ static void differentiation_sum_sub(struct Node **root)
     //calculation_of_subtree(root);
 }
 
-static void differentiation_mul_expressions(struct Node **root)
+static void differentiation_mul_expressions(struct Node **root, FILE *file_pointer)
 {
     if ((*root) == NULL)
     {
@@ -375,8 +376,8 @@ static void differentiation_mul_expressions(struct Node **root)
     Errors_of_tree error = NO_ERRORS;
     struct Node *old_left = copy_node((*root)->left, *root);
     struct Node *old_right = copy_node((*root)->right, *root);
-    differentiation(((*root)->left));
-    differentiation(((*root)->right));
+    differentiation(((*root)->left), file_pointer);
+    differentiation(((*root)->right), file_pointer);
     struct Node *diffirentiation_left = copy_node((*root)->left, *root);
     struct Node *diffirentiation_right = copy_node((*root)->right, *root);
     struct Value new_root_value = {.type = OPERATION, .operation = OP_ADD};
@@ -397,7 +398,7 @@ static void differentiation_mul_expressions(struct Node **root)
     return;
 }
 
-static void differentiation_pow(struct Node **root)
+static void differentiation_pow(struct Node **root, FILE *file_pointer)
 {
     if ((*root) == NULL)
     {
@@ -406,17 +407,17 @@ static void differentiation_pow(struct Node **root)
 
     if ((((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == NUMBER)
     {
-        calculation_of_subtree(root);
+        calculation_of_subtree(root, file_pointer);
         bool attempt = try_differentiation_constant(root);
         return;
     }
 
-    differentiation_pow_expression(root);
+    differentiation_pow_expression(root, file_pointer);
     return;
 }
 
 
-static void differentiation_pow_expression(struct Node **root)
+static void differentiation_pow_expression(struct Node **root, FILE *file_pointer)
 {
     if ((*root) == NULL)
     {
@@ -459,7 +460,7 @@ static void differentiation_pow_expression(struct Node **root)
 
 
 
-static void differentiation_mul(struct Node **root)
+static void differentiation_mul(struct Node **root, FILE *file_pointer)
 {
     if ((*root) == NULL)
     {
@@ -472,7 +473,7 @@ static void differentiation_mul(struct Node **root)
     // else if (((((*root)->left)->value).type == VARIABLE && (((*root)->right)->value).type == VARIABLE) ||
     //          (((*root)->left)->value).type == OPERATION || (((*root)->right)->value).type == OPERATION)
     // {
-    differentiation_mul_expressions(root);
+    differentiation_mul_expressions(root, file_pointer);
     // else if ((((*root)->left)->value).type == VARIABLE && (((*root)->right)->value).type == NUMBER ||
     //          (((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == VARIABLE)
     // {
@@ -480,7 +481,7 @@ static void differentiation_mul(struct Node **root)
     // }
     if ((((*root)->left)->value).type == NUMBER && (((*root)->right)->value).type == NUMBER)
     {
-        calculation_of_subtree(root);
+        calculation_of_subtree(root, file_pointer);
         bool attempt = try_differentiation_constant(root);
     }
 
@@ -488,7 +489,7 @@ static void differentiation_mul(struct Node **root)
 }
 
 
-static void differentiation_of_operation(struct Node **root)
+static void differentiation_of_operation(struct Node **root, FILE *file_pointer)
 {
     if ((*root) == NULL)
     {
@@ -498,7 +499,7 @@ static void differentiation_of_operation(struct Node **root)
     {
         if (K_operations[index].operation_type == ((*root)->value).operation)
         {
-            K_operations[index].differentiation(root);
+            K_operations[index].differentiation(root, file_pointer);
             break;
         }
     }
@@ -542,7 +543,7 @@ static bool try_differentiation_variable(struct Node **root)
     return false;
 }
 
-static bool try_differentiation_operation(struct Node **root)
+static bool try_differentiation_operation(struct Node **root, FILE *file_pointer)
 {
     if ((*root) == NULL)
     {
@@ -550,7 +551,7 @@ static bool try_differentiation_operation(struct Node **root)
     }
     if (((*root)->value).type == OPERATION)
     {
-        differentiation_of_operation(root);
+        differentiation_of_operation(root, file_pointer);
         return true;
     }
     return false;
@@ -583,7 +584,7 @@ static void differentiation_of_variable(struct Node **root)
 }
 
 
-void differentiation(struct Node *root)
+void differentiation(struct Node *root, FILE *file_pointer)
 {
     if (root == NULL)
     {
@@ -599,7 +600,7 @@ void differentiation(struct Node *root)
     {
         return;
     }
-    attempt = try_differentiation_operation(&root);
+    attempt = try_differentiation_operation(&root, file_pointer);
 }
 
 static void calculation_of_nodes(struct Value *left_value, struct Value *right_value, Operations operation, int *result)
@@ -621,7 +622,7 @@ static void calculation_of_nodes(struct Value *left_value, struct Value *right_v
 }
 
 
-static void calculation_of_subtree(struct Node **root)
+static void calculation_of_subtree(struct Node **root, FILE *file_pointer)
 {
     if ((*root) == NULL)
     {
@@ -633,22 +634,33 @@ static void calculation_of_subtree(struct Node **root)
                                                             && (((*root)->right)->value).type == NUMBER)
         {
             int result = 0;
+            latex_dump(*root, file_pointer, "Okay, let's find solution");
             calculation_of_nodes(&(((*root)->left)->value), &(((*root)->right)->value), ((*root)->value).operation, &result);
             replace_node_with_number(root, result);
+            if ((*root)->parent_node == NULL)
+            {
+                latex_dump(*root, file_pointer, "So, answer is");
+            }
+            else
+            {
+                char str[100] = "";
+                snprintf(str, 100, "%d", result);
+                special_latex_dump(str, file_pointer, "Answer is for the intermediate step");
+            }
         }
     }
     return;
 }
 
-void calculation_of_tree(struct Node *root)
+void calculation_of_tree(struct Node *root, FILE *file_pointer)
 {
     if (root == NULL)
     {
         return;
     }
-    calculation_of_tree(root->left);
-    calculation_of_tree(root->right);
-    calculation_of_subtree(&root);
+    calculation_of_tree(root->left, file_pointer);
+    calculation_of_tree(root->right, file_pointer);
+    calculation_of_subtree(&root, file_pointer);
 }
 
 
