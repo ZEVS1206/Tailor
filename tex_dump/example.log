@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.12.11)  25 JAN 2025 23:02
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.12.11)  26 JAN 2025 18:42
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -91,49 +91,457 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <5> on input line 10.
 
-/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:13: Undefined control sequence.
-l.13 Answer is for the intermediate step:  \texbf
-                                                 {\large18\normalsize}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:18: Undefined control sequence.
-l.18 Answer is for the intermediate step:  \texbf
-                                                 {\large2200\normalsize}
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
 /home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:23: Undefined control sequence.
-l.23 Answer is for the intermediate step:  \texbf
-                                                 {\large-2182\normalsize}
+l.23 \\Now, let's differentiate constant:  \texbf
+                                                 {\large 2 \normalsize}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
 misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:24: Undefined control sequence.
+l.24 ...swer is for the intermediate step:  \texbf
+                                                  {\large 0 \normalsize}
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:25: Undefined control sequence.
+l.25 \\Now, let's differentiate:  \texbf
+                                        {\large x \normalsize}
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:26: Undefined control sequence.
+l.26 ...swer is for the intermediate step:  \texbf
+                                                  {\large 1 \normalsize}
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:41: Undefined control sequence.
+l.41 \\Now, let's differentiate constant:  \texbf
+                                                 {\large 3 \normalsize}
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:42: Undefined control sequence.
+l.42 ...swer is for the intermediate step:  \texbf
+                                                  {\large 0 \normalsize}
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:43: Undefined control sequence.
+l.43 \\Now, let's differentiate:  \texbf
+                                        {\large x \normalsize}
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:44: Undefined control sequence.
+l.44 ...swer is for the intermediate step:  \texbf
+                                                  {\large 1 \normalsize}
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:57: Argument of \end  has an extra }.
+<inserted text> 
+                \par 
+l.57  \end
+          {equation}
+I've run across a `}' that doesn't seem to match anything.
+For example, `\def\a#1{...}' and `\a}' would produce
+this error. If you simply proceed now, the `\par' that
+I've just inserted will cause me to report a runaway
+argument that might be the root of the problem. But if
+your `}' was spurious, just type `2' and it will go away.
+
+Runaway argument?
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:57: Paragraph ended before \end  was complete.
+<to be read again> 
+                   \par 
+l.57  \end
+          {equation}
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:57: Missing $ inserted.
+<inserted text> 
+                $
+l.57  \end
+          {equation}
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:57: Missing } inserted.
+<inserted text> 
+                }
+l.57  \end
+          {equation}
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:57: Display math should end with $$.
+<to be read again> 
+                   \tex_par:D 
+l.57  \end
+          {equation}
+The `$' that I just saw supposedly matches a previous `$$'.
+So I shall assume that you typed `$$' both times.
 
 [1
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] (./example.aux) ) 
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:57: Extra }, or forgotten \endgroup.
+<recently read> }
+                 
+l.57  \end
+          {equation}
+I've deleted a group-closing symbol because it seems to be
+spurious, as in `$x}$'. But perhaps the } is legitimate and
+you forgot something else, as in `\hbox{$x}'. In such cases
+the way to recover is to insert both the forgotten and the
+deleted material, e.g., by typing `I$}'.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:85: Argument of \end  has an extra }.
+<inserted text> 
+                \par 
+l.85  \end
+          {equation}
+I've run across a `}' that doesn't seem to match anything.
+For example, `\def\a#1{...}' and `\a}' would produce
+this error. If you simply proceed now, the `\par' that
+I've just inserted will cause me to report a runaway
+argument that might be the root of the problem. But if
+your `}' was spurious, just type `2' and it will go away.
+
+Runaway argument?
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:85: Paragraph ended before \end  was complete.
+<to be read again> 
+                   \par 
+l.85  \end
+          {equation}
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:85: Missing $ inserted.
+<inserted text> 
+                $
+l.85  \end
+          {equation}
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:85: Missing } inserted.
+<inserted text> 
+                }
+l.85  \end
+          {equation}
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:85: Display math should end with $$.
+<to be read again> 
+                   \tex_par:D 
+l.85  \end
+          {equation}
+The `$' that I just saw supposedly matches a previous `$$'.
+So I shall assume that you typed `$$' both times.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:85: Extra }, or forgotten \endgroup.
+<recently read> }
+                 
+l.85  \end
+          {equation}
+I've deleted a group-closing symbol because it seems to be
+spurious, as in `$x}$'. But perhaps the } is legitimate and
+you forgot something else, as in `\hbox{$x}'. In such cases
+the way to recover is to insert both the forgotten and the
+deleted material, e.g., by typing `I$}'.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:93: Undefined control sequence.
+l.93 Answer is for the intermediate step:  \texbf
+                                                 {\large 0 \normalsize}
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:102: Undefined control sequence.
+l.102 Answer is for the intermediate step:  \texbf
+                                                  {\large 2 \normalsize}
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:111: Undefined control sequence.
+l.111 Answer is for the intermediate step:  \texbf
+                                                  {\large 2 \normalsize}
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:116: Undefined control sequence.
+l.116 Answer is for the intermediate step:  \texbf
+                                                  {\large 0 \normalsize}
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:125: Undefined control sequence.
+l.125 Answer is for the intermediate step:  \texbf
+                                                  {\large 3 \normalsize}
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+[2]
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:134: Undefined control sequence.
+l.134 Answer is for the intermediate step:  \texbf
+                                                  {\large -3 \normalsize}
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:141: Argument of \frac  has an extra }.
+<inserted text> 
+                \par 
+l.141 \frac{ -3 }}
+                  
+I've run across a `}' that doesn't seem to match anything.
+For example, `\def\a#1{...}' and `\a}' would produce
+this error. If you simply proceed now, the `\par' that
+I've just inserted will cause me to report a runaway
+argument that might be the root of the problem. But if
+your `}' was spurious, just type `2' and it will go away.
+
+Runaway argument?
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:141: Paragraph ended before \frac  was complete.
+<to be read again> 
+                   \par 
+l.141 \frac{ -3 }}
+                  
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:141: Missing $ inserted.
+<inserted text> 
+                $
+l.141 \frac{ -3 }}
+                  
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:141: Display math should end with $$.
+<to be read again> 
+                   \tex_par:D 
+l.141 \frac{ -3 }}
+                  
+The `$' that I just saw supposedly matches a previous `$$'.
+So I shall assume that you typed `$$' both times.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:141: Extra }, or forgotten \endgroup.
+<recently read> }
+                 
+l.141 \frac{ -3 }}
+                  
+I've deleted a group-closing symbol because it seems to be
+spurious, as in `$x}$'. But perhaps the } is legitimate and
+you forgot something else, as in `\hbox{$x}'. In such cases
+the way to recover is to insert both the forgotten and the
+deleted material, e.g., by typing `I$}'.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:142: You can't use `\eqno' in vertical mode.
+\endequation ->\eqno 
+                     \hbox {\@eqnnum }$$\@ignoretrue 
+l.142  \end{equation}
+                     
+Sorry, but I'm not programmed to handle this case;
+I'll just pretend that you didn't ask for it.
+If you're in the wrong mode, you might be able to
+return to the right one by typing `I}' or `I$' or `I\par'.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:142: Missing $ inserted.
+<inserted text> 
+                $
+l.142  \end{equation}
+                     
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:142: Display math should end with $$.
+<to be read again> 
+                   \endgroup 
+l.142  \end{equation}
+                     
+The `$' that I just saw supposedly matches a previous `$$'.
+So I shall assume that you typed `$$' both times.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:151: Argument of \frac  has an extra }.
+<inserted text> 
+                \par 
+l.151 \frac{ -3 }}
+                  
+I've run across a `}' that doesn't seem to match anything.
+For example, `\def\a#1{...}' and `\a}' would produce
+this error. If you simply proceed now, the `\par' that
+I've just inserted will cause me to report a runaway
+argument that might be the root of the problem. But if
+your `}' was spurious, just type `2' and it will go away.
+
+Runaway argument?
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:151: Paragraph ended before \frac  was complete.
+<to be read again> 
+                   \par 
+l.151 \frac{ -3 }}
+                  
+I suspect you've forgotten a `}', causing me to apply this
+control sequence to too much text. How can we recover?
+My plan is to forget the whole thing and hope for the best.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:151: Missing $ inserted.
+<inserted text> 
+                $
+l.151 \frac{ -3 }}
+                  
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:151: Display math should end with $$.
+<to be read again> 
+                   \tex_par:D 
+l.151 \frac{ -3 }}
+                  
+The `$' that I just saw supposedly matches a previous `$$'.
+So I shall assume that you typed `$$' both times.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:151: Extra }, or forgotten \endgroup.
+<recently read> }
+                 
+l.151 \frac{ -3 }}
+                  
+I've deleted a group-closing symbol because it seems to be
+spurious, as in `$x}$'. But perhaps the } is legitimate and
+you forgot something else, as in `\hbox{$x}'. In such cases
+the way to recover is to insert both the forgotten and the
+deleted material, e.g., by typing `I$}'.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:152: You can't use `\eqno' in vertical mode.
+\endequation ->\eqno 
+                     \hbox {\@eqnnum }$$\@ignoretrue 
+l.152  \end{equation}
+                     
+Sorry, but I'm not programmed to handle this case;
+I'll just pretend that you didn't ask for it.
+If you're in the wrong mode, you might be able to
+return to the right one by typing `I}' or `I$' or `I\par'.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:152: Missing $ inserted.
+<inserted text> 
+                $
+l.152  \end{equation}
+                     
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:152: Display math should end with $$.
+<to be read again> 
+                   \endgroup 
+l.152  \end{equation}
+                     
+The `$' that I just saw supposedly matches a previous `$$'.
+So I shall assume that you typed `$$' both times.
+
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <14.4> on input line 162.
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:162: Extra }, or forgotten $.
+<recently read> \egroup 
+                        
+l.162 \frac{ -3 }}
+                  
+I've deleted a group-closing symbol because it seems to be
+spurious, as in `$x}$'. But perhaps the } is legitimate and
+you forgot something else, as in `\hbox{$x}'. In such cases
+the way to recover is to insert both the forgotten and the
+deleted material, e.g., by typing `I$}'.
+
+
+/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex:168: LaTeX Error: \begin{equation} on input line 83 ended by \end{document}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.168 \end{document}
+                    
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+[3] (./example.aux) )
+(\end occurred inside a group at level 2)
+
+### semi simple group (level 2) entered at line 83 (\begingroup)
+### semi simple group (level 1) entered at line 55 (\begingroup)
+### bottom level 
 Here is how much of TeX's memory you used:
- 1276 strings out of 480247
- 20836 string characters out of 5896105
- 306667 words of memory out of 5000000
- 19256 multiletter control sequences out of 15000+600000
- 473207 words of font info for 41 fonts, out of 8000000 for 9000
+ 1279 strings out of 480247
+ 20887 string characters out of 5896105
+ 308667 words of memory out of 5000000
+ 19259 multiletter control sequences out of 15000+600000
+ 473822 words of font info for 43 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  55i,6n,62p,254b,193s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on example.pdf (1 page, 57864 bytes).
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
+Output written on example.pdf (3 pages, 79880 bytes).
 PDF statistics:
- 33 PDF objects out of 1000 (max. 8388607)
- 19 compressed objects within 1 object stream
+ 49 PDF objects out of 1000 (max. 8388607)
+ 29 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

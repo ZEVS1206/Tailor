@@ -14,7 +14,7 @@
 enum Mods_of_start
 {
     UNKNOWN_MODE     = 0,
-    DIFFERENTIATION = 1,
+    DIFFERENTIATION  = 1,
     CALCULATION      = 2
 };
 
@@ -101,5 +101,5 @@ void calculation_of_tree(struct Node *root, FILE *file_pointer);
 Errors_of_tree create_new_node(struct Node **root, struct Value *value, struct Node *left, struct Node *right);
 //Errors_of_tree create_operations_interface(struct List_of_operations *interface, char *all_operations);
 struct Node* copy_node(struct Node *root, struct Node *parent);
-void symplifying_tree(struct Node **root);
+void symplifying_tree(struct Node **root, FILE *file_pointer);
 #endif

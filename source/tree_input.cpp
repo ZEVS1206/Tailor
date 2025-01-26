@@ -31,6 +31,7 @@ static void bypass_of_tree(struct Node *root)
     }
     bypass_of_tree(root->left);
     bypass_of_tree(root->right);
+    //printf("root->value.type = %d\n", (root->value).type);
     if (root->left != NULL)
     {
         (root->left)->parent_node = root;

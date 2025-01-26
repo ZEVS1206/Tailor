@@ -183,17 +183,25 @@ int main()
         fprintf(stderr, "error = %d\n", tree.error);
         return 1;
     }
-    //differentiation(tree.root, latex_file_pointer);
-    calculation_of_tree(tree.tmp_root, latex_file_pointer);
+    if (mode == DIFFERENTIATION)
+    {
+        differentiation(tree.root, latex_file_pointer);
+        graphic_dump(&tree, "after_differentiation");
+        symplifying_tree(&(tree.root), latex_file_pointer);
+        graphic_dump(&tree, "after_symplifying");
+    }
+    else if (mode == CALCULATION)
+    {
+        calculation_of_tree(tree.tmp_root, latex_file_pointer);
+        graphic_dump(&tree, "after_calculation");
+    }
+    latex_dump(tree.root, latex_file_pointer, "\\maketitle\n\\section{So, answer is} \\textbf{\\Large ");
+    fprintf(latex_file_pointer, "}\n");
     if (tree.error != NO_ERRORS)
     {
         fprintf(stderr, "error = %d\n", tree.error);
         return 1;
     }
-    graphic_dump(&tree, "after_calculation");
-    //graphic_dump(&tree, "after_differentiation");
-    //symplifying_tree(&(tree.root));
-    //graphic_dump(&tree, "after_symplifying");
     error = close_latex_file(latex_file_pointer);
     if (error != NO_ERRORS)
     {
