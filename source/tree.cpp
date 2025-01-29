@@ -113,9 +113,9 @@ static void get_mode(Mods_of_start *mode);
 static void get_mode(Mods_of_start *mode)
 {
     printf("Please, choose mode for smart calculator:\n");
-    printf("differentation - 1\ncalculation - 2\n");
+    printf("differentation - 1\ncalculation - 2\ntest - 3\n");
     scanf("%d", mode);
-    while (*mode != DIFFERENTIATION && *mode != CALCULATION)
+    while (*mode != DIFFERENTIATION && *mode != CALCULATION && *mode != TEST)
     {
         printf("Please, enter another variant!\n");
         while(getchar() != '\n');

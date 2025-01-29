@@ -1,8 +1,8 @@
 # Fdb version 3
-["pdflatex"] 1737906141 "/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex" "example.pdf" "example" 1737906141
+["pdflatex"] 1738174665 "/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex" "example.pdf" "example" 1738174665
   "/etc/texmf/web2c/texmf.cnf" 1733934739 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/zevs_gromovergec/.texlive2021/texmf-var/web2c/pdftex/pdflatex.fmt" 1733934857 1405750 83b03e076ebffcee5e08a328f9b7eecf ""
-  "/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex" 1737906141 3545 92f1f49690cdf3b037b4136d11c514ba ""
+  "/home/zevs_gromovergec/Programming/Github/Tailor/tex_dump/example.tex" 1738174665 858 22cbcd933f15e7fcdae2c9f207131f45 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm" 1136768653 1328 c834bbb027764024c09d3d2bf908b5f0 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm" 1136768653 1324 c910af8c371558dc20f2d7822f66fe64 ""
@@ -38,8 +38,8 @@
   "/usr/share/texlive/texmf-dist/web2c/texmf.cnf" 1644012257 39432 7155514e09a3d69036fac785183a21c2 ""
   "/usr/share/texmf/web2c/texmf.cnf" 1644012257 39432 7155514e09a3d69036fac785183a21c2 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1734005433 4379155 98693266ff65f58d9f98aff394de12d2 ""
-  "example.aux" 1737906141 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
-  "example.tex" 1737906141 3545 92f1f49690cdf3b037b4136d11c514ba ""
+  "example.aux" 1738174665 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  "example.tex" 1738174665 858 22cbcd933f15e7fcdae2c9f207131f45 ""
   (generated)
   "example.aux"
   "example.log"

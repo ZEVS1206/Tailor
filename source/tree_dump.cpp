@@ -16,6 +16,7 @@ static char * get_type_name(Value_type type);
 static void get_value(struct Value *value, char *str);
 static char * get_operation(Operations operation);
 static char * get_var(Variables var);
+static const char * get_function(Function_name function);
 
 static Errors_of_tree create_command_for_console(const char *file_in_name, const char *file_out_name)
 {
@@ -104,8 +105,20 @@ static char * get_type_name(Value_type type)
         case VARIABLE:  return "VARIABLE";
         case NUMBER:    return "NUMBER";
         case OPERATION: return "OPERATION";
+        case FUNCTION:  return "FUNCTION";
         default:        return "UNKNOWN TYPE!";
     }
+}
+static const char * get_function(Function_name function)
+{
+    for (size_t index = 0; index < size_of_functions; index++)
+    {
+        if (function == G_functions[index].function_name)
+        {
+            return G_functions[index].function_str_name;
+        }
+    }
+    return "NOT A FUNCTION";
 }
 
 static void get_value(struct Value *value, char *str)
@@ -114,7 +127,7 @@ static void get_value(struct Value *value, char *str)
     {
         size_t size = get_size_of_number(value->number);
         char ans[100] = {0};
-        sprintf(str, "%d", value->number);
+        sprintf(str, "%f", value->number);
         return;
     }
     else if (value->type == OPERATION)
@@ -126,6 +139,12 @@ static void get_value(struct Value *value, char *str)
     else if (value->type == VARIABLE)
     {
         char *ans = get_var(value->variable);
+        memcpy(str, ans, strlen(ans));
+        return;
+    }
+    else if (value->type == FUNCTION)
+    {
+        const char *ans = get_function(value->function);
         memcpy(str, ans, strlen(ans));
         return;
     }
@@ -222,7 +241,6 @@ void graphic_dump(struct Tree *tree, char *operation)
     Errors_of_tree error = create_command_for_console(file_name, file_out_name);
     if (error != NO_ERRORS)
     {
-        printf("Here\n");
         tree->error = ERROR_OF_DUMP;
         return;
     }

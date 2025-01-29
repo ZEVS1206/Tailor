@@ -14,26 +14,39 @@ static void simplyfying_node_with_plus_or_minus(struct Node **root, FILE *file_p
 static void simplyfying_node_with_mul(struct Node **root, FILE *file_pointer);
 static void simplyfying_node_with_div(struct Node **root, FILE *file_pointer);
 static void simplyfying_node_with_pow(struct Node **root, FILE *file_pointer);
+static void simplyfying_node_with_sin(struct Node **root, FILE *file_pointer);
+static void simplyfying_node_with_cos(struct Node **root, FILE *file_pointer);
 static void create_value(struct Value *root_value, struct Value *new_value);
 static void destructor_recursive(struct Node *root);
 static void calculation_of_subtree(struct Node **root, FILE *file_pointer);
-static void calculation_of_nodes(struct Value *left_value, struct Value *right_value, Operations operation, int *result);
+static void calculation_of_nodes(struct Value *left_value, struct Value *right_value, Operations operation, double *result);
 static void differentiation_of_constant(struct Node **root, FILE *file_pointer);
 static void differentiation_of_variable(struct Node **root, FILE *file_pointer);
 static void differentiation_of_operation(struct Node **root, FILE *file_pointer);
+static void differentiation_of_function(struct Node **root, FILE *file_pointer);
 static void differentiation_sum_sub(struct Node **root, FILE *file_pointer);
 static void differentiation_mul(struct Node **root, FILE *file_pointer);
 static void differentiation_mul_expressions(struct Node **root, FILE *file_pointer);
 static void differentiation_pow_expression(struct Node **root, FILE *file_pointer);
 static void differentiation_pow(struct Node **root, FILE *file_pointer);
 static void differentiation_div(struct Node **root, FILE *file_pointer);
-static void replace_node_with_number(struct Node **root, int number);
+static void differentiation_of_func_sin(struct Node **root, FILE *file_pointer);
+static void differentiation_of_func_cos(struct Node **root, FILE *file_pointer);
+static void replace_node_with_number(struct Node **root, double number);
 static bool try_differentiation_constant(struct Node **root, FILE *file_pointer);
 static bool try_differentiation_variable(struct Node **root, FILE *file_pointer);
 static bool try_differentiation_operation(struct Node **root, FILE *file_pointer);
+static bool try_differentiation_function(struct Node **root, FILE* file_pointer);
 static void try_differentiation_of_constant_and_variable(struct Node **root, FILE *file_pointer);
-static void fill_interface(struct Operation_interface *operation);
 static bool is_node_number(const struct Node *root, int number);
+
+const struct Function_interface K_functions[] =
+{
+    {FUNC_SIN, simplyfying_node_with_sin, differentiation_of_func_sin, calculation_of_subtree}
+    // {FUNC_COS, simplyfying_node_with_cos, differentiation_of_func_cos, calculation_of_subtree}
+};
+
+const size_t size_of_arr_functions = sizeof(K_functions) / sizeof(K_functions[0]);
 
 const struct Operation_interface K_operations[] =
 {
@@ -58,6 +71,7 @@ static void create_value(struct Value *root_value, struct Value *new_value)
         case VARIABLE:  new_value->variable  = root_value->variable;  break;
         case NUMBER:    new_value->number    = root_value->number;    break;
         case OPERATION: new_value->operation = root_value->operation; break;
+        case FUNCTION:  new_value->function  = root_value->function;  break;
     }
     return;
 }
@@ -80,7 +94,7 @@ struct Node* copy_node(struct Node *root, struct Node *parent)
 
 
 
-static void replace_node_with_number(struct Node **root, int number)
+static void replace_node_with_number(struct Node **root, double number)
 {
     if ((*root) == NULL)
     {
@@ -117,6 +131,23 @@ static bool is_node_number(const struct Node *root, int number)
     }
     return false;
 }
+
+static void simplyfying_node_with_sin(struct Node **root, FILE *file_pointer)
+{
+    if ((*root) == NULL)
+    {
+        return;
+    }
+    latex_dump(*root, file_pointer, "Let's simplyfy this statement");
+    assert(((*root)->value).type == FUNCTION);
+    assert(((*root)->value).function == FUNC_SIN);
+    if ((((*root)->left)->value).type == NUMBER)
+    {
+        return calculation_of_subtree(root, file_pointer);
+    }
+    return;
+}
+
 
 
 static void simplyfying_node_with_plus_or_minus(struct Node **root, FILE *file_pointer)
@@ -172,7 +203,7 @@ static void simplyfying_node_with_mul(struct Node **root, FILE *file_pointer)
         new_root_value.number = 0;
         error = create_new_node(root, &new_root_value, NULL, NULL);
         char str[100] = "";
-        snprintf(str, 100, "%d", ((*root)->value).number);
+        snprintf(str, 100, "%f", ((*root)->value).number);
         special_latex_dump(str, file_pointer, "Answer is for the intermediate step");
         return;
     }
@@ -221,7 +252,7 @@ static void simplyfying_node_with_div(struct Node **root, FILE *file_pointer)
         new_root_value.number = 0;
         error = create_new_node(root, &new_root_value, NULL, NULL);
         char str[100] = "";
-        snprintf(str, 100, "%d", ((*root)->value).number);
+        snprintf(str, 100, "%f", ((*root)->value).number);
         special_latex_dump(str, file_pointer, "Answer is for the intermediate step");
         return;
     }
@@ -260,7 +291,7 @@ static void simplyfying_node_with_pow(struct Node **root, FILE *file_pointer)
         new_root_value.number = 1;
         error = create_new_node(root, &new_root_value, NULL, NULL);
         char str[100] = "";
-        snprintf(str, 100, "%d", ((*root)->value).number);
+        snprintf(str, 100, "%f", ((*root)->value).number);
         special_latex_dump(str, file_pointer, "Answer is for the intermediate step");
         return;
     }
@@ -308,6 +339,43 @@ void symplifying_tree(struct Node **root, FILE *file_pointer)
         //     calculation_of_subtree(root);
         // }
     }
+    else if (((*root)->value).type == FUNCTION)
+    {
+        for (size_t index = 0; index < size_of_arr_functions; index++)
+        {
+            if (K_functions[index].function_name == ((*root)->value).function)
+            {
+                K_functions[index].symplifying_tree(root, file_pointer);
+                break;
+            }
+        }
+    }
+    return;
+}
+
+
+
+static void differentiation_of_func_sin(struct Node **root, FILE *file_pointer)
+{
+    if ((*root) == NULL)
+    {
+        return;
+    }
+    struct Node *old_left = copy_node((*root)->left, *root);
+    latex_dump(*root, file_pointer, "It's not hard to notice, that if we differentiate");
+    differentiation((*root)->left, file_pointer);
+    struct Node *differentiation_left = copy_node((*root)->left, *root);
+    struct Value new_root_value = {.type = OPERATION, .operation = OP_MUL};
+    struct Value new_root_left_value = {.type = FUNCTION, .function = FUNC_COS};
+    Errors_of_tree error = NO_ERRORS;
+    struct Node *new_function = NULL;
+    error = create_new_node(&new_function, &new_root_left_value, old_left, NULL);
+    if (error != NO_ERRORS)
+    {
+        return;
+    }
+    error = create_new_node(root, &new_root_value, new_function, differentiation_left);
+    latex_dump(*root, file_pointer, "We will get");
     return;
 }
 
@@ -513,6 +581,24 @@ static void differentiation_mul(struct Node **root, FILE *file_pointer)
     return;
 }
 
+static void differentiation_of_function(struct Node **root, FILE *file_pointer)
+{
+    if ((*root) == NULL)
+    {
+        return;
+    }
+
+    for(size_t index = 0; index < size_of_arr_functions; index++)
+    {
+        if (K_functions[index].function_name == ((*root)->value).function)
+        {
+            K_functions[index].differentiation(root, file_pointer);
+            break;
+        }
+    }
+    return;
+}
+
 
 static void differentiation_of_operation(struct Node **root, FILE *file_pointer)
 {
@@ -582,6 +668,20 @@ static bool try_differentiation_operation(struct Node **root, FILE *file_pointer
     return false;
 }
 
+static bool try_differentiation_function(struct Node **root, FILE* file_pointer)
+{
+    if ((*root) == NULL)
+    {
+        return false;
+    }
+    if (((*root)->value).type == FUNCTION)
+    {
+        differentiation_of_function(root, file_pointer);
+        return true;
+    }
+    return false;
+}
+
 static void differentiation_of_constant(struct Node **root, FILE *file_pointer)
 {
     if ((*root) == NULL)
@@ -591,7 +691,7 @@ static void differentiation_of_constant(struct Node **root, FILE *file_pointer)
     if (((*root)->value).type == NUMBER)
     {
         char str[100] = "";
-        snprintf(str, 100, "%d", ((*root)->value).number);
+        snprintf(str, 100, "%f", ((*root)->value).number);
         special_latex_dump(str, file_pointer, "\\\\Now, let's differentiate constant");
         replace_node_with_number(root, 0);
         special_latex_dump("0", file_pointer, "\\\\Answer is for the intermediate step");
@@ -608,7 +708,8 @@ static void differentiation_of_variable(struct Node **root, FILE *file_pointer)
     if (((*root)->value).type == VARIABLE)
     {
         const char *str = transform_variable_to_str((*root)->value);
-        printf("%s\n", str);
+        //printf("%s\n", str);
+        // latex_dump(*root, file_pointer, "\\\\Now, let's differentiate");
         special_latex_dump(str, file_pointer, "\\\\Now, let's differentiate");
         replace_node_with_number(root, 1);
         special_latex_dump("1", file_pointer, "\\\\Answer is for the intermediate step");
@@ -634,9 +735,14 @@ void differentiation(struct Node *root, FILE *file_pointer)
         return;
     }
     attempt = try_differentiation_operation(&root, file_pointer);
+    if (attempt)
+    {
+        return;
+    }
+    attempt = try_differentiation_function(&root, file_pointer);
 }
 
-static void calculation_of_nodes(struct Value *left_value, struct Value *right_value, Operations operation, int *result)
+static void calculation_of_nodes(struct Value *left_value, struct Value *right_value, Operations operation, double *result)
 {
     if (left_value == NULL || right_value == NULL)
     {
@@ -666,17 +772,31 @@ static void calculation_of_subtree(struct Node **root, FILE *file_pointer)
         if ((*root)->left != NULL && (*root)->right != NULL && (((*root)->left )->value).type == NUMBER
                                                             && (((*root)->right)->value).type == NUMBER)
         {
-            int result = 0;
+            double result = 0;
             latex_dump(*root, file_pointer, "Okay, let's find solution");
             calculation_of_nodes(&(((*root)->left)->value), &(((*root)->right)->value), ((*root)->value).operation, &result);
             replace_node_with_number(root, result);
             if ((*root)->parent_node != NULL)
             {
                 char str[100] = "";
-                snprintf(str, 100, "%d", result);
+                snprintf(str, 100, "%f", result);
                 special_latex_dump(str, file_pointer, "Answer is for the intermediate step");
             }
         }
+    }
+    else if (((*root)->value).type == FUNCTION)
+    {
+        double result = 0;
+        //latex_dump(*root, file_pointer, "Okay, let's find solution");
+        for (size_t index = 0; index < size_of_functions; index++)
+        {
+            if (G_functions[index].function_name == ((*root)->value).function)
+            {
+                result = G_functions[index].proccess_function((((*root)->left)->value).number);
+                break;
+            }
+        }
+        replace_node_with_number(root, result);
     }
     return;
 }
