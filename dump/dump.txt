@@ -1,0 +1,7 @@
+digraph Tree {
+node [margin = "0.01"];
+rankdir = "TB";
+box0x7c08877e00d0 [shape = record, label = "{<node_par>parent = 0x7c08877e0090|<node_adr>address = 0x7c08877e00d0|<node_t>type = VARIABLE|<node_v>value = x|{<node_l>left_node = (nil)|<node_r>right_node = (nil)}}"];
+box0x7c08877e0090 [shape = record, label = "{<node_par>parent = (nil)|<node_adr>address = 0x7c08877e0090|<node_t>type = FUNCTION|<node_v>value = cos|{<node_l>left_node = 0x7c08877e00d0|<node_r>right_node = (nil)}}"];
+box0x7c08877e0090:<node_l>->box0x7c08877e00d0 [color=red];
+}
